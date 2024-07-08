@@ -44,7 +44,7 @@ jobs:
         REMOTE_USER: ${{secrets.SERVER_USER}}
         SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
         REMOTE_PORT: 22
-        SOURCE: 'be/build/libs/tinkerbell-0.0.1-SNAPSHOT.jar'
+        SOURCE: 'build/libs/tinkerbell-0.0.1-SNAPSHOT.jar'
         TARGET: '~'
         SCRIPT_AFTER: |
           pid=$(ps aux | grep "tinkerbell-0.0.1-SNAPSHOT.jar" | grep -v grep | awk '{print $2}')
