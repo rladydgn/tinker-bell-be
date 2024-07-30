@@ -3,7 +3,7 @@ package com.example.tinkerbell.oAuth.controller;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.service.OAuthService;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/oauth")
+@RequiredArgsConstructor
 public class OAuthController {
-    @Autowired
-    private OAuthService oAuthService;
+    private final OAuthService oAuthService;
     @Value("${fe.url}")
     private String feUrl;
 

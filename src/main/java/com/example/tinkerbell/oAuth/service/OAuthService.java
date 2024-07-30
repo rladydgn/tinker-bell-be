@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -23,18 +23,17 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OAuthService {
+    private static final int EXPIRE_TIME = 24 * 60 * 1000;
+    private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
     @Value("${oauth.kakao.client-id}")
     private String clientId;
     @Value("${oauth.kakao.redirect-url}")
     private String redirectUrl;
     @Value("${jwt.secret}")
     private String secret;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private UserRepository userRepository;
-    private static final int EXPIRE_TIME = 24 * 60 * 1000;
 
     public KaKaoTokenResponseDto getOAuthToken(String code) {
         WebClient webClient = WebClient.builder().baseUrl("https://kauth.kakao.com").defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8").build();
