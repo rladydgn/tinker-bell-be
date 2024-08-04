@@ -6,9 +6,11 @@ import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.oAuth.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class OAuthService {
+    //github.com/jwtk/jjwt (JWTs 문서)
     private static final int EXPIRE_TIME = 24 * 60 * 1000;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
@@ -98,6 +101,27 @@ public class OAuthService {
         log.info("res: " + refreshToken);
 
         return TokenDto.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    }
+
+    public boolean verifyToken(String token) {
+        return Jwts
+                .parser()
+                .verifyWith(this.getSecret())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload().getExpiration().after(new Date());
+    }
+
+    public User getUserFromToken(String token) {
+        Claims claims = Jwts
+                .parser()
+                .verifyWith(this.getSecret())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return this.userRepository.findByEmailAndProvider(claims.get("email").toString(), claims.get("provider").toString())
+                .orElseThrow(() -> new ValidationException("유저를 찾을 수 없습니다."));
     }
 
     private SecretKey getSecret() {
