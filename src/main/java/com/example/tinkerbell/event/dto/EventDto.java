@@ -3,8 +3,10 @@ package com.example.tinkerbell.event.dto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class EventDto {
@@ -23,5 +25,16 @@ public class EventDto {
         @Max(value = 3000)
         private int totalPeopleNumber;
         private List<ScheduleDto.InitRequest> scheduleDtoList;
+    }
+
+    @Data
+    @Builder
+    public static class Response {
+        private int id;
+        private String title;
+        private int totalPeopleNumber;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private List<ScheduleDto.Response> scheduleDtoList;
     }
 }

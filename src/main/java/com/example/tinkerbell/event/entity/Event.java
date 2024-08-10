@@ -1,19 +1,20 @@
 package com.example.tinkerbell.event.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Builder
 @ToString
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Event {
     @Id
@@ -31,4 +32,7 @@ public class Event {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "event_id")
+    private List<Schedule> scheduleList;
 }

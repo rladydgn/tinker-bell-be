@@ -2,6 +2,7 @@ package com.example.tinkerbell.event.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
@@ -13,6 +14,14 @@ public class ScheduleDto {
     public static class InitRequest {
         @Min(value = 1)
         @Max(value = 3000)
+        private int peopleNumber;
+        private LocalDateTime date;
+    }
+
+    @Data
+    @Builder
+    public static class Response {
+        private int id;
         private int peopleNumber;
         private LocalDateTime date;
     }
