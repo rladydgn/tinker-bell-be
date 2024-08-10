@@ -2,11 +2,13 @@ package com.example.tinkerbell.event.controller;
 
 import com.example.tinkerbell.event.dto.EventDto;
 import com.example.tinkerbell.event.service.EventService;
-import jakarta.validation.Valid;
+import com.example.tinkerbell.oAuth.annotation.Login;
+import com.example.tinkerbell.oAuth.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping
-    public ResponseEntity<Void> saveEvent(@Valid EventDto.Request eventDtoRequest) {
-        this.eventService.saveEvent(eventDtoRequest);
+    @PostMapping("/init")
+    public ResponseEntity<Void> saveFirstEventAndSchedules(@Login User user, @RequestBody EventDto.InitRequest eventDtoRequest) {
+        this.eventService.saveFirstEventAndSchedules(eventDtoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
