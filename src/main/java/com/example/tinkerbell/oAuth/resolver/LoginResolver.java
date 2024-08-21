@@ -28,12 +28,9 @@ public class LoginResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        String token = webRequest.getHeader("Authorization");
-        if (Objects.isNull(token)) {
-            throw new ValidationException("토큰 인증 실패: 토큰값이 존재하지 않음");
-        }
-        if (this.oAuthService.verifyToken(token)) {
-            return this.oAuthService.getUserFromToken(token);
+        String token = oAuthService.getToken(webRequest.getHeader("Authorization"));
+        if (oAuthService.verifyToken(token)) {
+            return oAuthService.getUserFromToken(token);
         }
         throw new ValidationException("토큰 인증 실패: " + token);
     }

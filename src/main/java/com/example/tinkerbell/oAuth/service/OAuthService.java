@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -122,6 +123,18 @@ public class OAuthService {
 
         return this.userRepository.findByEmailAndProvider(claims.get("email").toString(), claims.get("provider").toString())
                 .orElseThrow(() -> new ValidationException("유저를 찾을 수 없습니다."));
+    }
+
+    public String getToken(String token) {
+        if(Objects.isNull(token)) {
+            throw new ValidationException("토큰 인증 실패: 토큰값이 존재하지 않음");
+        }
+
+        String[] str = token.split(" ");
+        if(str.length != 2 || !str[0].equals("Bearer")) {
+            throw new ValidationException("지원하지 않는 토큰 타입입니다.");
+        }
+        return str[1];
     }
 
     private SecretKey getSecret() {
