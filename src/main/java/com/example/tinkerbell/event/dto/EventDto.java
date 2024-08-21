@@ -24,7 +24,7 @@ public class EventDto {
         @Min(value = 1)
         @Max(value = 3000)
         private int totalPeopleNumber;
-        private List<ScheduleDto.InitRequest> scheduleDtoList;
+        private List<ScheduleDto.Request> scheduleDtoList;
     }
 
     @Data

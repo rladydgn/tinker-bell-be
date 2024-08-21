@@ -27,7 +27,7 @@ public class EventService {
     @Transactional
     public void saveFirstEventAndSchedules(EventDto.InitRequest eventDto, User user) {
         int schedulePeopleNumber = eventDto.getScheduleDtoList().stream().map(
-                        ScheduleDto.InitRequest::getPeopleNumber)
+                        ScheduleDto.Request::getPeopleNumber)
                 .reduce(0, Integer::sum);
         if (eventDto.getTotalPeopleNumber() < schedulePeopleNumber) {
             throw new ValidationException("스케줄 합 인원수("

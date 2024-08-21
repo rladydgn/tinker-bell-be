@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class ScheduleDto {
     @Data
     @ToString
-    public static class InitRequest {
+    public static class Request {
         @Min(value = 1)
         @Max(value = 3000)
         private int peopleNumber;
