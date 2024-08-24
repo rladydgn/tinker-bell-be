@@ -2,6 +2,7 @@ package com.example.tinkerbell.oAuth.controller;
 
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.service.OAuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +20,10 @@ public class OAuthController {
     private String feUrl;
 
     @GetMapping("/redirect")
-    public void redirect(@RequestParam("code") String code, HttpServletResponse response) throws Exception {
+    public void redirect(@RequestParam("code") String code, @RequestParam("redUrl") String redUrl, HttpServletResponse response) throws Exception {
         TokenDto tokenDto = oAuthService.getAuthToken(code);
-        response.sendRedirect(feUrl + "?accessToken=" + tokenDto.getAccessToken()
-                + "&refreshToken=" + tokenDto.getRefreshToken());
+        response.addCookie(new Cookie("accessToken", tokenDto.getAccessToken()));
+        response.addCookie(new Cookie("refreshToken", tokenDto.getRefreshToken()));
+        response.sendRedirect(feUrl);
     }
 }
