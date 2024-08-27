@@ -38,6 +38,7 @@ public class OAuthController {
 		String redirectUrl = request.getHeader("referer");
 		if (StringUtils.isEmpty(redirectUrl)) {
 			response.sendRedirect(feUrl);
+			return;
 		}
 		response.sendRedirect(redirectUrl);
 	}
