@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @Value("{hello}")
-    private String he;
+	@Value("{hello}")
+	private String he;
 
-    @GetMapping
-    public String hello() {
-        System.out.println(he);
-        return "hello";
-    }
+	@GetMapping
+	public String hello() {
+		System.out.println(he);
+		return "hello";
+	}
 }

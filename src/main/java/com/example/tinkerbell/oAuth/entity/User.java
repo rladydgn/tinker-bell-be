@@ -12,10 +12,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String nickname;
-    private String email;
-    private String provider;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
+	private String nickname;
+	private String email;
+	private String provider;
 }

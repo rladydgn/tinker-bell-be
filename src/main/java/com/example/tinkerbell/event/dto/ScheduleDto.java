@@ -9,22 +9,22 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 public class ScheduleDto {
-    @Data
-    @ToString
-    public static class Request {
-        @Min(value = 1)
-        @Max(value = 3000)
-        private int peopleNumber;
-        private LocalDateTime date;
-    }
+	@Data
+	@ToString
+	public static class Request {
+		@Min(value = 1)
+		@Max(value = 3000)
+		private int peopleNumber;
+		private LocalDateTime date;
+	}
 
-    @Data
-    @Builder
-    public static class Response {
-        private int id;
-        private int peopleNumber;
-        private LocalDateTime date;
-    }
+	@Data
+	@Builder
+	public static class Response {
+		private int id;
+		private int peopleNumber;
+		private LocalDateTime date;
+	}
 }
 
 
