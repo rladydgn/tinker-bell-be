@@ -1,5 +1,6 @@
 package com.example.tinkerbell.oAuth.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -21,6 +22,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/oauth")
 @RequiredArgsConstructor
+@Slf4j
 public class OAuthController {
 	private final OAuthService oAuthService;
 	@Value("${fe.url}")
@@ -40,8 +42,9 @@ public class OAuthController {
 		// 쿠키 허용 도메인
 		URI uri = new URI(redirectUrl);
 		String domain = uri.getHost();
-		if(domain.contains("www.ticketbell.store")) {
+		if(domain.contains("www")) {
 			domain.replace("www", "");
+			log.info("check: " + domain);
 		}
 
 		String accessTokenCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
