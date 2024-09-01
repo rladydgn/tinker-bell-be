@@ -40,6 +40,9 @@ public class OAuthController {
 		// 쿠키 허용 도메인
 		URI uri = new URI(redirectUrl);
 		String domain = uri.getHost();
+		if(domain.contains("www.ticketbell.store")) {
+			domain.replace("www", "");
+		}
 
 		String accessTokenCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 				.domain(domain)
