@@ -43,7 +43,7 @@ public class OAuthController {
 		URI uri = new URI(redirectUrl);
 		String domain = uri.getHost();
 		if(domain.contains("www")) {
-			domain.replace("www", "");
+			domain = domain.replace("www", "");
 			log.info("check: " + domain);
 		}
 
