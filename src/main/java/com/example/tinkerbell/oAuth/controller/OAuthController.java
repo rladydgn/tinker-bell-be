@@ -44,12 +44,14 @@ public class OAuthController {
 		String accessTokenCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 				.domain(domain)
 				.path("/")
+				.sameSite("lax")
 				.build()
 				.toString();
 
 		String refreshTokenCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 				.domain(domain)
 				.path("/")
+				.sameSite("lax")
 				.build()
 				.toString();
 
