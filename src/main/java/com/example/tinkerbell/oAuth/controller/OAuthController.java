@@ -1,6 +1,7 @@
 package com.example.tinkerbell.oAuth.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -12,12 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.service.OAuthService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
-import java.net.URI;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/oauth")
@@ -42,24 +41,27 @@ public class OAuthController {
 		// 쿠키 허용 도메인
 		URI uri = new URI(redirectUrl);
 		String domain = uri.getHost();
-		if(domain.contains("www")) {
+		if (domain.startsWith("www")) {
 			domain = domain.replace("www", "");
+			log.info("check: " + domain);
+		} else if (domain.startsWith("dev")) {
+			domain = domain.replace("dev", "");
 			log.info("check: " + domain);
 		}
 
 		String accessTokenCookie = ResponseCookie.from("accessToken", tokenDto.getAccessToken())
-				.domain(domain)
-				.path("/")
-				.sameSite("lax")
-				.build()
-				.toString();
+			.domain(domain)
+			.path("/")
+			.sameSite("lax")
+			.build()
+			.toString();
 
 		String refreshTokenCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
-				.domain(domain)
-				.path("/")
-				.sameSite("lax")
-				.build()
-				.toString();
+			.domain(domain)
+			.path("/")
+			.sameSite("lax")
+			.build()
+			.toString();
 
 		response.addHeader("set-Cookie", accessTokenCookie);
 		response.addHeader("set-Cookie", refreshTokenCookie);
