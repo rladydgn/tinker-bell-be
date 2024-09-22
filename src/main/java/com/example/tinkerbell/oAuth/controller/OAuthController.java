@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.service.OAuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class OAuthController {
 	@Value("${fe.url}")
 	private String feUrl;
 
+	@Operation(summary = "oauth 로그인 리다이렉트", description = "oauth 로그인 리다이렉트(kakao)")
 	@GetMapping("/redirect")
 	public void redirect(@RequestParam("code") String code,
 		HttpServletRequest request, HttpServletResponse response) throws Exception {

@@ -3,6 +3,7 @@ package com.example.tinkerbell.oAuth.controller;
 import com.example.tinkerbell.oAuth.annotation.Login;
 import com.example.tinkerbell.oAuth.entity.User;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @RequestMapping("/token")
 @RequiredArgsConstructor
 public class TokenController {
+	@Operation(summary = "토큰 검증", description = "토큰 검증")
 	@GetMapping("/verify")
 	public ResponseEntity<Void> verifyToken(@Login User user) {
 		if (Objects.isNull(user)) {
