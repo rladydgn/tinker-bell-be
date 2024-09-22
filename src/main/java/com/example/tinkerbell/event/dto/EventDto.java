@@ -39,7 +39,7 @@ public class EventDto {
 		private EventStatus status;
 		private LocalDateTime startDate;
 		private LocalDateTime endDate;
-		private List<ScheduleDto.Response> scheduleDtoList;
+		private List<ScheduleDto.Response> scheduleList;
 	}
 
 	public static EventDto.Response toResponse(Event event, LocalDateTime startDate, LocalDateTime endDate, List<ScheduleDto.Response> scheduleDtoList) {
