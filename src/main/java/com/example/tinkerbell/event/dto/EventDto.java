@@ -9,6 +9,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.tinkerbell.event.entity.Event;
+
 public class EventDto {
 	@Data
 	public static class Request {
@@ -36,5 +38,15 @@ public class EventDto {
 		private LocalDateTime startDate;
 		private LocalDateTime endDate;
 		private List<ScheduleDto.Response> scheduleDtoList;
+	}
+
+	public static EventDto.Response toResponse(Event event, LocalDateTime startDate, LocalDateTime endDate, List<ScheduleDto.Response> scheduleDtoList) {
+		return EventDto.Response.builder()
+			.id(event.getId())
+			.title(event.getTitle())
+			.startDate(startDate)
+			.endDate(endDate)
+			.scheduleDtoList(scheduleDtoList)
+			.build();
 	}
 }

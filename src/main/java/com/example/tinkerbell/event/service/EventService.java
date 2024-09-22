@@ -1,5 +1,13 @@
 package com.example.tinkerbell.event.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.tinkerbell.event.dto.EventDto;
 import com.example.tinkerbell.event.dto.ScheduleDto;
 import com.example.tinkerbell.event.entity.Event;
@@ -11,13 +19,6 @@ import com.example.tinkerbell.oAuth.entity.User;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -65,7 +66,7 @@ public class EventService {
 
 	@Transactional(readOnly = true)
 	public List<EventDto.Response> getEvents(User user) {
-		// TODO: 쿼리 조인이 발생하지 않고 있음
+		// FIXME: 쿼리 조인이 발생하지 않고 있음
 		List<Event> eventList = eventRepository.findAllByUserIdOrderByCreatedAt(user.getId());
 		List<EventDto.Response> eventDtoResponse = new ArrayList<>();
 		eventList.forEach(event -> {
@@ -73,37 +74,38 @@ public class EventService {
 				throw new ValidationException("스케줄이 존재하지 않습니다.");
 			}
 
-			LocalDateTime startDate = event.getScheduleList().getFirst().getDate();
-			LocalDateTime endDate = event.getScheduleList().getFirst().getDate();
-			List<ScheduleDto.Response> scheduleDtoList = new ArrayList<>();
+			List<ScheduleDto.Response> scheduleDtoList = event.getScheduleList().stream().map(ScheduleDto::toResponse).toList();
+			Pair<LocalDateTime, LocalDateTime> startDateAndEndDatePair = getStartDateAndEndDate(event.getScheduleList());
 
-			for (Schedule schedule : event.getScheduleList()) {
-				if (schedule.getDate().isBefore(startDate)) {
-					startDate = schedule.getDate();
-				}
-				if (schedule.getDate().isAfter(endDate)) {
-					endDate = schedule.getDate();
-				}
-				ScheduleDto.Response response = ScheduleDto.Response.builder()
-					.id(schedule.getId())
-					.applicantLimit(schedule.getApplicantLimit())
-					.applicantCount(schedule.getApplicantCount())
-					.date(schedule.getDate())
-					.build();
-				scheduleDtoList.add(response);
-			}
-
-			EventDto.Response response = EventDto.Response.builder()
-				.id(event.getId())
-				.title(event.getTitle())
-				.startDate(startDate)
-				.endDate(endDate)
-				.scheduleDtoList(scheduleDtoList)
-				.build();
+			EventDto.Response response = EventDto.toResponse(event, startDateAndEndDatePair.getLeft(), startDateAndEndDatePair.getRight(), scheduleDtoList);
 
 			eventDtoResponse.add(response);
 		});
 
 		return eventDtoResponse;
+	}
+
+	@Transactional(readOnly = true)
+	public EventDto.Response getEvent(int id, User user) {
+		Event event = eventRepository.findOneByIdAndUserId(id, user.getId()).orElseThrow(() -> new RuntimeException("찾을수 없는 이벤트 입니다."));
+		List<ScheduleDto.Response> scheduleDtoList = event.getScheduleList().stream().map(ScheduleDto::toResponse).toList();
+		Pair<LocalDateTime, LocalDateTime> startDateAndEndDatePair = getStartDateAndEndDate(event.getScheduleList());
+		return EventDto.toResponse(event, startDateAndEndDatePair.getLeft(), startDateAndEndDatePair.getRight(), scheduleDtoList);
+	}
+
+	private Pair<LocalDateTime, LocalDateTime> getStartDateAndEndDate(List<Schedule> scheduleList) {
+		LocalDateTime startDate = scheduleList.getFirst().getDate();
+		LocalDateTime endDate = scheduleList.getFirst().getDate();
+
+		for (Schedule schedule : scheduleList) {
+			if (schedule.getDate().isBefore(startDate)) {
+				startDate = schedule.getDate();
+			}
+			if (schedule.getDate().isAfter(endDate)) {
+				endDate = schedule.getDate();
+			}
+		}
+
+		return Pair.of(startDate, endDate);
 	}
 }

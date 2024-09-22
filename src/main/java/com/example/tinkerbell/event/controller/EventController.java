@@ -35,6 +35,12 @@ public class EventController {
 		return ResponseEntity.ok().body(responseList);
 	}
 
+	@GetMapping("/{id}")
+	public ResponseEntity<EventDto.Response> getEvent(@Login User user, @PathVariable int id) {
+		EventDto.Response response = this.eventService.getEvent(id, user);
+		return ResponseEntity.ok().body(response);
+	}
+
 	@GetMapping("/{eventId}/schedules/{scheduleId}")
 	public ResponseEntity<ScheduleDto.Response> getSchedule(@Login User user, @PathVariable int eventId,
 		@PathVariable int scheduleId) {
