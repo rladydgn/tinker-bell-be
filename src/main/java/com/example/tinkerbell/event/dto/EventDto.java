@@ -58,7 +58,7 @@ public class EventDto {
 			.title(event.getTitle())
 			.startDate(startDate)
 			.endDate(endDate)
-			.scheduleDtoList(scheduleDtoList)
+			.scheduleList(scheduleDtoList)
 			.status(eventStatus)
 			.build();
 	}
