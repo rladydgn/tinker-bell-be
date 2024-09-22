@@ -14,7 +14,7 @@ public class EventDto {
 	public static class Request {
 		@NotBlank
 		private String title;
-		private int totalPeopleNumber;
+		private int totalApplicantLimit;
 	}
 
 	@Data
@@ -23,7 +23,7 @@ public class EventDto {
 		private String title;
 		@Min(value = 1)
 		@Max(value = 3000)
-		private int totalPeopleNumber;
+		private int totalApplicantLimit;
 		private List<ScheduleDto.Request> scheduleDtoList;
 	}
 
@@ -32,7 +32,7 @@ public class EventDto {
 	public static class Response {
 		private int id;
 		private String title;
-		private int totalPeopleNumber;
+		private int totalApplicantLimit;
 		private LocalDateTime startDate;
 		private LocalDateTime endDate;
 		private List<ScheduleDto.Response> scheduleDtoList;

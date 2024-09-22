@@ -31,7 +31,7 @@ public class ScheduleService {
 
 		return ScheduleDto.Response.builder()
 			.id(schedule.getId())
-			.peopleNumber(schedule.getPeopleNumber())
+			.applicantLimit(schedule.getApplicantLimit())
 			.date(schedule.getDate())
 			.build();
 	}

@@ -14,7 +14,7 @@ public class ScheduleDto {
 	public static class Request {
 		@Min(value = 1)
 		@Max(value = 3000)
-		private int peopleNumber;
+		private int applicantLimit;
 		private LocalDateTime date;
 	}
 
@@ -22,7 +22,8 @@ public class ScheduleDto {
 	@Builder
 	public static class Response {
 		private int id;
-		private int peopleNumber;
+		private int applicantLimit;
+		private int applicantCount;
 		private LocalDateTime date;
 	}
 }

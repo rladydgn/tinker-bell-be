@@ -22,8 +22,10 @@ public class Schedule {
 	private int id;
 	@Column(name = "event_id")
 	private int eventId;
-	@Column(name = "people_number")
-	private int peopleNumber;
+	@Column(name = "applicant_limit")
+	private int applicantLimit;
+	@Column(name = "applicant_count")
+	private int applicantCount;
 	@Column
 	private LocalDateTime date;
 	@CreatedDate

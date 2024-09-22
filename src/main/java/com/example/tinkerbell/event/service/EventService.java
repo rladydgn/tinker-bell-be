@@ -28,20 +28,20 @@ public class EventService {
 
 	@Transactional
 	public void saveFirstEventAndSchedules(EventDto.InitRequest eventDto, User user) {
-		int schedulePeopleNumber = eventDto.getScheduleDtoList().stream().map(
-				ScheduleDto.Request::getPeopleNumber)
+		int scheduleApplicantLimit = eventDto.getScheduleDtoList().stream().map(
+				ScheduleDto.Request::getApplicantLimit)
 			.reduce(0, Integer::sum);
-		if (eventDto.getTotalPeopleNumber() < schedulePeopleNumber) {
+		if (eventDto.getTotalApplicantLimit() < scheduleApplicantLimit) {
 			throw new ValidationException("스케줄 합 인원수("
-				+ schedulePeopleNumber
+				+ scheduleApplicantLimit
 				+ ")는 행사 총 인원수("
-				+ eventDto.getTotalPeopleNumber()
+				+ eventDto.getTotalApplicantLimit()
 				+ ") 를 넘을 수 없습니다.");
 		}
 
 		Event event = Event.builder()
 			.title(eventDto.getTitle())
-			.totalPeopleNumber(eventDto.getTotalPeopleNumber())
+			.totalApplicantLimit(eventDto.getTotalApplicantLimit())
 			.userId(user.getId())
 			.build();
 		this.eventRepository.save(event);
@@ -52,7 +52,8 @@ public class EventService {
 		eventDto.getScheduleDtoList().forEach(scheduleDto -> {
 			Schedule schedule = Schedule.builder()
 				.eventId(event.getId())
-				.peopleNumber(scheduleDto.getPeopleNumber())
+				.applicantLimit(scheduleDto.getApplicantLimit())
+				.applicantCount(0)
 				.date(scheduleDto.getDate())
 				.build();
 			scheduleList.add(schedule);
@@ -85,7 +86,8 @@ public class EventService {
 				}
 				ScheduleDto.Response response = ScheduleDto.Response.builder()
 					.id(schedule.getId())
-					.peopleNumber(schedule.getPeopleNumber())
+					.applicantLimit(schedule.getApplicantLimit())
+					.applicantCount(schedule.getApplicantCount())
 					.date(schedule.getDate())
 					.build();
 				scheduleDtoList.add(response);

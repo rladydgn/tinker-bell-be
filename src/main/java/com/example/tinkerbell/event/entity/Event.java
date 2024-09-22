@@ -25,8 +25,8 @@ public class Event {
 	private int userId;
 	@Column
 	private String title;
-	@Column(name = "total_people_number")
-	private int totalPeopleNumber;
+	@Column(name = "total_applicant_limit")
+	private int totalApplicantLimit;
 	@CreatedDate
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
