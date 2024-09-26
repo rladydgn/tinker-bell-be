@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
