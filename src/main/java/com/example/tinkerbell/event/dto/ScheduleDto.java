@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+import com.example.tinkerbell.event.entity.EventStatus;
 import com.example.tinkerbell.event.entity.Schedule;
 
 public class ScheduleDto {
@@ -27,14 +28,16 @@ public class ScheduleDto {
 		private int applicantLimit;
 		private int applicantCount;
 		private LocalDateTime date;
+		private EventStatus status;
 	}
 
 	public static ScheduleDto.Response toResponse(Schedule schedule) {
-		return ScheduleDto.Response.builder()
+		return Response.builder()
 			.id(schedule.getId())
 			.applicantLimit(schedule.getApplicantLimit())
 			.applicantCount(schedule.getApplicantCount())
 			.date(schedule.getDate())
+			.status(schedule.getDate().isBefore(LocalDateTime.now()) ? EventStatus.STAND_BY : EventStatus.END)
 			.build();
 	}
 }
