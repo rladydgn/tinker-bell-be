@@ -32,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OAuthService {
 	//github.com/jwtk/jjwt (JWTs 문서)
-	private static final int EXPIRE_TIME = 24 * 60 * 60 * 1000;
+	private static final int EXPIRE_TIME = 90 * 24 * 60 * 60 * 1000;
 	private final ObjectMapper objectMapper;
 	private final UserRepository userRepository;
 	@Value("${oauth.kakao.client-id}")
