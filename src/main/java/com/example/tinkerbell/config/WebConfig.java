@@ -1,15 +1,17 @@
 package com.example.tinkerbell.config;
 
-import com.example.tinkerbell.oAuth.resolver.LoginResolver;
+import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
+import com.example.tinkerbell.oAuth.resolver.LoginResolver;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,5 +30,10 @@ public class WebConfig implements WebMvcConfigurer {
 			.allowedMethods("*")
 			.allowedHeaders("*")
 			.allowCredentials(true);
+	}
+
+	@Bean
+	public ModelMapper modelMapper() {
+		return new ModelMapper();
 	}
 }

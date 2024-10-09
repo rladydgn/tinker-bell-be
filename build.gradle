@@ -48,6 +48,8 @@ dependencies {
 
 	// utils
 	implementation 'org.apache.commons:commons-lang3'
+
+	implementation 'org.modelmapper:modelmapper:3.2.1'
 }
 
 tasks.named('test') {

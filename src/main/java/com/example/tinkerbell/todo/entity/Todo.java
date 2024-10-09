@@ -1,4 +1,4 @@
-package com.example.tinkerbell.event.entity;
+package com.example.tinkerbell.todo.entity;
 
 import java.time.LocalDateTime;
 
@@ -6,39 +6,34 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.example.tinkerbell.oAuth.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
-@Builder
-@ToString
-@Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @EntityListeners(AuditingEntityListener.class)
-public class Schedule {
+public class Todo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "event_id")
-	private int eventId;
-	@Column(name = "applicant_limit")
-	private int applicantLimit;
-	@Column(name = "applicant_count")
-	private int applicantCount;
+	@Column(name = "is_completed")
+	private boolean isCompleted;
 	@Column
-	private LocalDateTime date;
+	private String title;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 	@CreatedDate
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
