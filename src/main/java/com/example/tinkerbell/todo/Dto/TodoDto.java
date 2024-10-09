@@ -1,5 +1,7 @@
 package com.example.tinkerbell.todo.Dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +24,7 @@ public class TodoDto {
 	public static class Response {
 		private int id;
 		private String title;
+		@JsonProperty("isCompleted")
 		private boolean isCompleted;
 	}
 }
