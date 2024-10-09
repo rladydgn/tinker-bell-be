@@ -1,5 +1,17 @@
 package com.example.tinkerbell.oAuth.service;
 
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import com.example.tinkerbell.oAuth.dto.KaKaoTokenResponseDto;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.entity.User;
@@ -15,24 +27,12 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import javax.crypto.SecretKey;
-
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuthService {
 	//github.com/jwtk/jjwt (JWTs 문서)
-	private static final int EXPIRE_TIME = 90 * 24 * 60 * 60 * 1000;
+	private static final int EXPIRE_TIME = 30 * 24 * 60 * 60 * 1000;
 	private final ObjectMapper objectMapper;
 	private final UserRepository userRepository;
 	@Value("${oauth.kakao.client-id}")
@@ -106,7 +106,6 @@ public class OAuthService {
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
-			// 1일
 			.expiration(new Date(System.currentTimeMillis() + EXPIRE_TIME))
 			.signWith(this.getSecret())
 			.compact();
@@ -116,7 +115,6 @@ public class OAuthService {
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
-			// 1주일
 			.expiration(new Date(System.currentTimeMillis() + EXPIRE_TIME * 7))
 			.signWith(this.getSecret())
 			.compact();
