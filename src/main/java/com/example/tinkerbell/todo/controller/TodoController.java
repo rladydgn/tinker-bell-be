@@ -63,7 +63,7 @@ public class TodoController {
 	}
 
 	@Operation(summary = "todo 완료 상태 변경")
-	@PatchMapping(value = "/{id}")
+	@PatchMapping(value = "completion/{id}")
 	public ResponseEntity<Void> changeTodoIsCompleted(@PathVariable int id,
 		@RequestBody TodoDto.IsCompletedRequest todoIsCompletedDto, @Login User user) {
 		todoService.changeTodoIsCompleted(id, todoIsCompletedDto, user);
