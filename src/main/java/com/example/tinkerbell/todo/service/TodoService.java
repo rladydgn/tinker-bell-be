@@ -63,6 +63,18 @@ public class TodoService {
 		todoRepository.delete(todo);
 	}
 
+	@Transactional
+	public void changeTodoIsCompleted(int id, TodoDto.IsCompletedRequest todoIsCompletedDto, User user) {
+		Todo todo = todoRepository.findById(id).orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
+
+		if (!isTodoOwner(todo, user)) {
+			throw new ValidationException("todo 의 소유자가 아닙니다.");
+		}
+
+		todo.setCompleted(todoIsCompletedDto.isCompleted());
+		todoRepository.save(todo);
+	}
+
 	private boolean isTodoOwner(Todo todo, User user) {
 		return todo.getUser().getId() == user.getId() ? true : false;
 	}

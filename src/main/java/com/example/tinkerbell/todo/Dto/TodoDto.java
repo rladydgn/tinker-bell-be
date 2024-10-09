@@ -13,6 +13,12 @@ public class TodoDto {
 
 	@Setter
 	@Getter
+	public static class IsCompletedRequest {
+		private boolean isCompleted;
+	}
+
+	@Setter
+	@Getter
 	public static class Response {
 		private int id;
 		private String title;

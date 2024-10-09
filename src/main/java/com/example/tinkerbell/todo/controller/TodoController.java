@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,6 +59,14 @@ public class TodoController {
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> removeTodo(@PathVariable int id, @Login User user) {
 		todoService.removeTodo(id, user);
+		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "todo 완료 상태 변경")
+	@PatchMapping(value = "/{id}")
+	public ResponseEntity<Void> changeTodoIsCompleted(@PathVariable int id,
+		@RequestBody TodoDto.IsCompletedRequest todoIsCompletedDto, @Login User user) {
+		todoService.changeTodoIsCompleted(id, todoIsCompletedDto, user);
 		return ResponseEntity.ok().build();
 	}
 }
