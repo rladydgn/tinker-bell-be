@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OAuthService {
 	//github.com/jwtk/jjwt (JWTs 문서)
-	private static final int EXPIRE_TIME = 30 * 24 * 60 * 60 * 1000;
+	private static final long ThirtyDaysInMs = 30l * 24l * 60l * 60l * 1000l;
 	private final ObjectMapper objectMapper;
 	private final UserRepository userRepository;
 	@Value("${oauth.kakao.client-id}")
@@ -106,7 +106,7 @@ public class OAuthService {
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + EXPIRE_TIME))
+			.expiration(new Date(System.currentTimeMillis() + ThirtyDaysInMs))
 			.signWith(this.getSecret())
 			.compact();
 
@@ -115,10 +115,10 @@ public class OAuthService {
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + EXPIRE_TIME * 7))
+			.expiration(new Date(System.currentTimeMillis() + ThirtyDaysInMs * 3))
 			.signWith(this.getSecret())
 			.compact();
-
+		
 		log.info("acc: " + accessToken);
 		log.info("res: " + refreshToken);
 
