@@ -16,6 +16,7 @@ public class TodoDto {
 	@Setter
 	@Getter
 	public static class IsCompletedRequest {
+		@JsonProperty("isCompleted")
 		private boolean isCompleted;
 	}
 
