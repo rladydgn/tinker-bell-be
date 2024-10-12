@@ -14,6 +14,6 @@ public class GlobalExceptionHandler {
 		ErrorResponseDto errorResponseDto = new ErrorResponseDto();
 		errorResponseDto.setCode(HttpStatus.BAD_REQUEST.value());
 		errorResponseDto.setMessage(exception.getMessage());
-		return ResponseEntity.ok(errorResponseDto);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
 	}
 }
