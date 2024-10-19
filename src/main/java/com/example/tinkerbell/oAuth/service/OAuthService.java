@@ -1,5 +1,7 @@
 package com.example.tinkerbell.oAuth.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -8,6 +10,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -32,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OAuthService {
 	//github.com/jwtk/jjwt (JWTs 문서)
-	private static final long ThirtyDaysInMs = 30l * 24l * 60l * 60l * 1000l;
+	private static final long THIRTY_DAYS_MS = 30L * 24L * 60L * 60L * 1000L;
 	private final ObjectMapper objectMapper;
 	private final UserRepository userRepository;
 	@Value("${oauth.kakao.client-id}")
@@ -42,7 +45,7 @@ public class OAuthService {
 	@Value("${jwt.secret}")
 	private String secret;
 
-	public KaKaoTokenResponseDto getOAuthToken(String code) {
+	public KaKaoTokenResponseDto getKaKaoToken(String code) {
 		WebClient webClient = WebClient.builder()
 			.baseUrl("https://kauth.kakao.com")
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
@@ -65,7 +68,7 @@ public class OAuthService {
 		}
 	}
 
-	public User getUserInfo(KaKaoTokenResponseDto kaKaoTokenResponseDto) throws Exception {
+	public User getUser(KaKaoTokenResponseDto kaKaoTokenResponseDto) throws Exception {
 		WebClient webClient = WebClient.builder()
 			.baseUrl("https://kapi.kakao.com")
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
@@ -90,14 +93,29 @@ public class OAuthService {
 		}
 	}
 
-	public TokenDto getAuthToken(String code) throws Exception {
-		KaKaoTokenResponseDto kaKaoTokenResponseDto = getOAuthToken(code);
-		User user = getUserInfo(kaKaoTokenResponseDto);
+	public TokenDto getAuthToken(String code, String referer) throws Exception {
+		KaKaoTokenResponseDto kaKaoTokenResponseDto = getKaKaoToken(code);
+		User user = getUser(kaKaoTokenResponseDto);
 		if (userRepository.findByEmailAndProvider(user.getEmail(), "kakao").isEmpty()) {
 			userRepository.save(user);
 		}
 
-		return makeToken(user);
+		TokenDto tokenDto = makeToken(user);
+		String domain = getRequestDomainFromReferer(referer);
+
+		tokenDto.setAccessToken(ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+			.domain(domain)
+			.path("/")
+			.build()
+			.toString());
+
+		tokenDto.setRefreshToken(ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
+			.domain(domain)
+			.path("/")
+			.build()
+			.toString());
+
+		return tokenDto;
 	}
 
 	public TokenDto makeToken(User user) {
@@ -106,7 +124,7 @@ public class OAuthService {
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + ThirtyDaysInMs))
+			.expiration(new Date(System.currentTimeMillis() + THIRTY_DAYS_MS))
 			.signWith(this.getSecret())
 			.compact();
 
@@ -115,10 +133,10 @@ public class OAuthService {
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + ThirtyDaysInMs * 3))
+			.expiration(new Date(System.currentTimeMillis() + THIRTY_DAYS_MS * 3))
 			.signWith(this.getSecret())
 			.compact();
-		
+
 		log.info("acc: " + accessToken);
 		log.info("res: " + refreshToken);
 
@@ -162,5 +180,18 @@ public class OAuthService {
 	private SecretKey getSecret() {
 		byte[] bytes = Decoders.BASE64.decode(this.secret);
 		return Keys.hmacShaKeyFor(bytes);
+	}
+
+	private String getRequestDomainFromReferer(String referer) throws URISyntaxException {
+		URI uri = new URI(referer);
+		String domain = uri.getHost();
+		if (domain.startsWith("www")) { // www.ticketbell.store
+			domain = domain.replace("www", "");
+		} else if (domain.startsWith("dev")) { // dev.sticketbell.store
+			domain = domain.replace("dev", "");
+		}
+		log.info("check: " + domain);
+
+		return domain;
 	}
 }
