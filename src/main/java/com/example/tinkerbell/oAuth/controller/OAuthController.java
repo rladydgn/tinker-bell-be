@@ -1,5 +1,8 @@
 package com.example.tinkerbell.oAuth.controller;
 
+import java.net.URI;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OAuthController {
 	private final OAuthService oAuthService;
-	private final String DOMAIN = "ticketbell.store";
+	@Value("${fe.url}")
+	private String feUrl;
 
 	@Operation(summary = "oauth 로그인 리다이렉트", description = "oauth 로그인 리다이렉트(kakao)")
 	@GetMapping("/redirect")
@@ -28,11 +32,13 @@ public class OAuthController {
 		HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		// 쿠키 허용 도메인
-		TokenDto tokenDto = oAuthService.getAuthToken(code, DOMAIN);
+		URI url = new URI(feUrl);
+		String domain = url.getHost().replace("www", "");
+		TokenDto tokenDto = oAuthService.getAuthToken(code, domain);
 
 		response.addHeader("set-Cookie", tokenDto.getAccessToken());
 		response.addHeader("set-Cookie", tokenDto.getRefreshToken());
 
-		response.sendRedirect(DOMAIN);
+		response.sendRedirect(feUrl);
 	}
 }
