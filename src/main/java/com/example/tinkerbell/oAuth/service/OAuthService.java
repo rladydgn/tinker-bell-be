@@ -1,7 +1,5 @@
 package com.example.tinkerbell.oAuth.service;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -93,7 +91,7 @@ public class OAuthService {
 		}
 	}
 
-	public TokenDto getAuthToken(String code, String referer) throws Exception {
+	public TokenDto getAuthToken(String code, String domain) throws Exception {
 		KaKaoTokenResponseDto kaKaoTokenResponseDto = getKaKaoToken(code);
 		User user = getUser(kaKaoTokenResponseDto);
 		if (userRepository.findByEmailAndProvider(user.getEmail(), "kakao").isEmpty()) {
@@ -101,7 +99,6 @@ public class OAuthService {
 		}
 
 		TokenDto tokenDto = makeToken(user);
-		String domain = getRequestDomainFromReferer(referer);
 
 		tokenDto.setAccessToken(ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 			.domain(domain)
@@ -180,18 +177,5 @@ public class OAuthService {
 	private SecretKey getSecret() {
 		byte[] bytes = Decoders.BASE64.decode(this.secret);
 		return Keys.hmacShaKeyFor(bytes);
-	}
-
-	private String getRequestDomainFromReferer(String referer) throws URISyntaxException {
-		URI uri = new URI(referer);
-		String domain = uri.getHost();
-		if (domain.startsWith("www")) { // www.ticketbell.store
-			domain = domain.replace("www", "");
-		} else if (domain.startsWith("dev")) { // dev.sticketbell.store
-			domain = domain.replace("dev", "");
-		}
-		log.info("check: " + domain);
-
-		return domain;
 	}
 }
