@@ -1,5 +1,7 @@
 package com.example.tinkerbell.todo.Dto;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -11,6 +13,7 @@ public class TodoDto {
 	@Getter
 	public static class Request {
 		private String title;
+		private LocalDateTime date;
 	}
 
 	@Setter
@@ -27,5 +30,6 @@ public class TodoDto {
 		private String title;
 		@JsonProperty("isCompleted")
 		private boolean isCompleted;
+		private LocalDateTime date;
 	}
 }

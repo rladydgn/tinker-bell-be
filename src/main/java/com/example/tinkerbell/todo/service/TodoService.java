@@ -49,6 +49,7 @@ public class TodoService {
 		}
 
 		todo.setTitle(todoDto.getTitle());
+		todo.setDate(todoDto.getDate());
 		todoRepository.save(todo);
 	}
 

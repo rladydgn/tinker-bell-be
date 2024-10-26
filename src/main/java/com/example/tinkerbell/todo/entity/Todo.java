@@ -40,4 +40,6 @@ public class Todo {
 	@LastModifiedDate
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+	@Column
+	private LocalDateTime date;
 }
