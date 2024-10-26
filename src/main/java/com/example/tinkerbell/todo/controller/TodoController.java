@@ -43,10 +43,10 @@ public class TodoController {
 
 	@Operation(summary = "todo 생성")
 	@PostMapping
-	public ResponseEntity<Void> saveTodo(@RequestBody TodoDto.Request todoDto,
+	public ResponseEntity<TodoDto.Response> saveTodo(@RequestBody TodoDto.Request todoDto,
 		@Parameter(hidden = true) @Login User user) {
-		todoService.saveTodo(todoDto, user);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		TodoDto.Response response = todoService.saveTodo(todoDto, user);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@Operation(summary = "todo 수정", description = "유저 본인이 생성한 todo 만 수정 가능")

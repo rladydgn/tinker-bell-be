@@ -34,10 +34,10 @@ public class TodoService {
 	}
 
 	@Transactional
-	public void saveTodo(TodoDto.Request todoDto, User user) {
+	public TodoDto.Response saveTodo(TodoDto.Request todoDto, User user) {
 		Todo todo = modelMapper.map(todoDto, Todo.class);
 		todo.setUser(user);
-		todoRepository.save(todo);
+		return modelMapper.map(todoRepository.save(todo), TodoDto.Response.class);
 	}
 
 	@Transactional
