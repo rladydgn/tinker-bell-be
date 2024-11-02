@@ -1,5 +1,7 @@
 package com.example.tinkerbell.oAuth.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -177,5 +179,10 @@ public class OAuthService {
 	private SecretKey getSecret() {
 		byte[] bytes = Decoders.BASE64.decode(this.secret);
 		return Keys.hmacShaKeyFor(bytes);
+	}
+
+	public String getDomain(String url) throws URISyntaxException {
+		URI uri = new URI(url);
+		return uri.getHost().replace("www", "");
 	}
 }
