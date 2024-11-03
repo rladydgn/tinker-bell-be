@@ -132,7 +132,7 @@ public class AppleOAuthService {
 			byte[] bytes = Decoders.BASE64.decode(inputStream.readAllBytes().toString());
 			return Keys.hmacShaKeyFor(bytes);
 		} catch (IOException e) {
-			log.info("[애플 로그인]: pk 파일 로딩 실패");
+			log.info("[애플 로그인]: pk 파일 로딩 실패", e);
 			throw new RuntimeException("애플 로그인 실패");
 		}
 	}
