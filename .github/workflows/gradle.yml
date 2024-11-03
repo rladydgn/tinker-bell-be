@@ -35,7 +35,7 @@ jobs:
     - name: Build with Gradle Wrapper
       run: |
         echo "${{secrets.APPLICATION}}" > src/main/resources/application.yml
-        echo "${{secrets.APPLE_LOGIN_PK}}" > src/main/resources/static/ticketbell.p8
+        echo "${{secrets.APPLE_LOGIN_PK}}" > src/main/resources/ticketbell.p8
         chmod +x ./gradlew
         ./gradlew build
 
