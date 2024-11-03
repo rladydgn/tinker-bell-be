@@ -22,7 +22,6 @@ import com.example.tinkerbell.oAuth.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,7 +126,8 @@ public class AppleOAuthService {
 			ClassPathResource resource = new ClassPathResource("ticketbell.p8");
 			InputStream inputStream = resource.getInputStream();
 			// 가져온 파일 내용을 base64로 디코드
-			byte[] bytes = Decoders.BASE64.decode(inputStream.readAllBytes().toString());
+			byte[] bytes = inputStream.readAllBytes();
+			// byte[] bytes = Decoders.BASE64.decode(inputStream.readAllBytes().toString());
 			return Keys.hmacShaKeyFor(bytes);
 		} catch (IOException e) {
 			log.info("[애플 로그인]: pk 파일 로딩 실패", e);
