@@ -1,6 +1,5 @@
 package com.example.tinkerbell.oAuth.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -8,7 +7,7 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -125,8 +124,7 @@ public class AppleOAuthService {
 
 	private SecretKey getSecret() {
 		try {
-			Resource resource = resourceLoader.getResource("ticketbell.p8");
-			File file = resource.getFile();
+			ClassPathResource resource = new ClassPathResource("ticketbell.p8");
 			InputStream inputStream = resource.getInputStream();
 			// 가져온 파일 내용을 base64로 디코드
 			byte[] bytes = Decoders.BASE64.decode(inputStream.readAllBytes().toString());
