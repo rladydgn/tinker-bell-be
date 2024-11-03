@@ -61,7 +61,7 @@ public class AppleOAuthService {
 				.bodyToMono(AppleTokenResponseDto.class)
 				.block();
 		} catch (WebClientResponseException e) {
-			log.error("[애플 로그인 실패] " + e.getMessage());
+			log.error("[애플 로그인 실패] " + e);
 			throw e;
 		}
 	}
