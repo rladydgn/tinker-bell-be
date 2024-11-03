@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.tinkerbell.oAuth.dto.TokenDto;
+import com.example.tinkerbell.oAuth.service.AppleOAuthService;
+import com.example.tinkerbell.oAuth.service.KaKaoOAuthService;
 import com.example.tinkerbell.oAuth.service.OAuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OAuthController {
 	private final OAuthService oAuthService;
+	private final KaKaoOAuthService kaKaoOAuthService;
+	private final AppleOAuthService appleOAuthService;
 	@Value("${fe.url}")
 	private String feUrl;
 
@@ -29,7 +33,7 @@ public class OAuthController {
 
 		// 쿠키 허용 도메인
 		String domain = oAuthService.getDomain(feUrl);
-		TokenDto tokenDto = oAuthService.getAuthToken(code, domain);
+		TokenDto tokenDto = kaKaoOAuthService.getAuthToken(code, domain);
 
 		response.addHeader("set-Cookie", tokenDto.getAccessToken());
 		response.addHeader("set-Cookie", tokenDto.getRefreshToken());
@@ -39,8 +43,13 @@ public class OAuthController {
 
 	@Operation(summary = "oauth 애플 로그인 리다이렉트")
 	@GetMapping("/redirect/apple")
-	public String appleRedirect(@RequestParam("code") String code) throws Exception {
+	public void appleRedirect(@RequestParam("code") String code, HttpServletResponse response) throws Exception {
 		String domain = oAuthService.getDomain(feUrl);
-		return "code: " + code + " domain: " + domain;
+		TokenDto tokenDto = appleOAuthService.getAuthToken(code, domain);
+
+		response.addHeader("set-Cookie", tokenDto.getAccessToken());
+		response.addHeader("set-Cookie", tokenDto.getRefreshToken());
+
+		response.sendRedirect(feUrl);
 	}
 }
