@@ -151,8 +151,10 @@ public class AppleOAuthService {
 				.replace("-----END PRIVATE KEY-----", "")
 				.replaceAll("\\s", "");
 
+			log.info("pk: " + privateKey);
+
 			byte[] privateKeyBytes = Decoders.BASE64.decode(privateKey);
-			
+
 			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
 			KeyFactory keyFactory = KeyFactory.getInstance("EC");
 			return keyFactory.generatePrivate(keySpec);
