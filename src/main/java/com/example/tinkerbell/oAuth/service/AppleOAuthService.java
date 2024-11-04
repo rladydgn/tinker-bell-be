@@ -22,7 +22,6 @@ import com.example.tinkerbell.oAuth.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +114,7 @@ public class AppleOAuthService {
 			.audience() // aud
 			.add("https://appleid.apple.com")
 			.and()
-			.signWith(this.getSecret(), SignatureAlgorithm.ES256)
+			.signWith(this.getSecret(), Jwts.SIG.HS256)
 			.header()
 			.keyId(appleSecret)
 			.and()
