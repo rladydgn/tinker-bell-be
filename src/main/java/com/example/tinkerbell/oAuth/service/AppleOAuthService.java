@@ -147,7 +147,7 @@ public class AppleOAuthService {
 
 	private PrivateKey getPrivateKey() {
 		try {
-			Resource resource = resourceLoader.getResource("ticketbell.p8");
+			Resource resource = resourceLoader.getResource("ticketbell.txt");
 			InputStream inputStream = resource.getInputStream();
 			String privateKey = inputStream.readAllBytes().toString();
 
