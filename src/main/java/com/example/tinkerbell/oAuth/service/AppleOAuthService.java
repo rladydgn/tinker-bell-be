@@ -94,6 +94,7 @@ public class AppleOAuthService {
 
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
 		Claims claims = Jwts.parser()
+			.decryptWith(getPrivateKey())
 			.build()
 			.parseSignedClaims(appleTokenResponseDto.getIdToken())
 			.getPayload();
@@ -117,7 +118,7 @@ public class AppleOAuthService {
 			.header()
 			.keyId(appleSecret)
 			.and()
-			.signWith(this.getPrivateKey(), Jwts.SIG.ES256)
+			.signWith(getPrivateKey(), Jwts.SIG.ES256)
 			.compact();
 		log.info("[애플 로그인] 로그인 요청 인증 토큰: " + token);
 		return token;
