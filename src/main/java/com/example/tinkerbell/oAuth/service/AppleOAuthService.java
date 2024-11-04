@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -46,6 +47,9 @@ public class AppleOAuthService {
 	private String appleSecret;
 	@Value("${jwt.secret}")
 	private String secret;
+
+	@Value("ticketbell.p8")
+	private Resource resourceFile;
 
 	public AppleTokenResponseDto getAppleToken(String code) {
 		WebClient webClient = WebClient.builder()
@@ -143,9 +147,11 @@ public class AppleOAuthService {
 
 	private PrivateKey getPrivateKey() {
 		try {
-			ClassPathResource resource = new ClassPathResource("ticketbell.p8");
+			Resource resource = resourceLoader.getResource("ticketbell.p8");
 			InputStream inputStream = resource.getInputStream();
 			String privateKey = inputStream.readAllBytes().toString();
+
+			log.info("pk s: " + privateKey);
 
 			privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "")
 				.replace("-----END PRIVATE KEY-----", "")
