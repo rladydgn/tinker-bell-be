@@ -1,16 +1,11 @@
 package com.example.tinkerbell.oAuth.service;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 
-import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -26,7 +21,6 @@ import com.example.tinkerbell.oAuth.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,7 +94,6 @@ public class AppleOAuthService {
 
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
 		Claims claims = Jwts.parser()
-			.verifyWith(this.getSecret())
 			.build()
 			.parseSignedClaims(appleTokenResponseDto.getIdToken())
 			.getPayload();
@@ -128,20 +121,6 @@ public class AppleOAuthService {
 			.compact();
 		log.info("[애플 로그인] 로그인 요청 인증 토큰: " + token);
 		return token;
-	}
-
-	private SecretKey getSecret() {
-		try {
-			ClassPathResource resource = new ClassPathResource("ticketbell.p8");
-			InputStream inputStream = resource.getInputStream();
-			// 가져온 파일 내용을 base64로 디코드
-			byte[] bytes = inputStream.readAllBytes();
-			// byte[] bytes = Decoders.BASE64.decode(inputStream.readAllBytes().toString());
-			return Keys.hmacShaKeyFor(bytes);
-		} catch (IOException e) {
-			log.info("[애플 로그인]: pk 파일 로딩 실패", e);
-			throw new RuntimeException("애플 로그인 실패");
-		}
 	}
 
 	private PrivateKey getPrivateKey() {
