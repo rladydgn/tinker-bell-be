@@ -11,7 +11,6 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -48,8 +47,8 @@ public class AppleOAuthService {
 	@Value("${jwt.secret}")
 	private String secret;
 
-	@Value("ticketbell.p8")
-	private Resource resourceFile;
+	@Value("${oauth.apple.private-key}")
+	private String privateKey;
 
 	public AppleTokenResponseDto getAppleToken(String code) {
 		WebClient webClient = WebClient.builder()
@@ -147,17 +146,17 @@ public class AppleOAuthService {
 
 	private PrivateKey getPrivateKey() {
 		try {
-			Resource resource = resourceLoader.getResource("ticketbell.txt");
-			InputStream inputStream = resource.getInputStream();
-			String privateKey = inputStream.readAllBytes().toString();
-
-			log.info("pk s: " + privateKey);
-
-			privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "")
-				.replace("-----END PRIVATE KEY-----", "")
-				.replaceAll("\\s", "");
-
-			log.info("pk: " + privateKey);
+			// Resource resource = resourceLoader.getResource("ticketbell.txt");
+			// InputStream inputStream = resource.getInputStream();
+			// String privateKey = inputStream.readAllBytes().toString();
+			//
+			// log.info("pk s: " + privateKey);
+			//
+			// privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "")
+			// 	.replace("-----END PRIVATE KEY-----", "")
+			// 	.replaceAll("\\s", "");
+			//
+			// log.info("pk: " + privateKey);
 
 			byte[] privateKeyBytes = Decoders.BASE64.decode(privateKey);
 
