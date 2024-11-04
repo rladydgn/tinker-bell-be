@@ -115,7 +115,7 @@ public class AppleOAuthService {
 			.audience() // aud
 			.add("https://appleid.apple.com")
 			.and()
-			.signWith(SignatureAlgorithm.ES256, this.getSecret())
+			.signWith(this.getSecret(), SignatureAlgorithm.ES256)
 			.header()
 			.keyId(appleSecret)
 			.and()
