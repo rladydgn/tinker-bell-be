@@ -2,6 +2,9 @@ package com.example.tinkerbell.oAuth.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -22,6 +25,7 @@ import com.example.tinkerbell.oAuth.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,10 +118,10 @@ public class AppleOAuthService {
 			.audience() // aud
 			.add("https://appleid.apple.com")
 			.and()
-			.signWith(this.getSecret(), Jwts.SIG.HS256)
 			.header()
 			.keyId(appleSecret)
 			.and()
+			.signWith(this.getPrivateKey(), Jwts.SIG.ES256)
 			.compact();
 		log.info("[애플 로그인] 로그인 요청 인증 토큰: " + token);
 		return token;
@@ -133,6 +137,27 @@ public class AppleOAuthService {
 			return Keys.hmacShaKeyFor(bytes);
 		} catch (IOException e) {
 			log.info("[애플 로그인]: pk 파일 로딩 실패", e);
+			throw new RuntimeException("애플 로그인 실패");
+		}
+	}
+
+	private PrivateKey getPrivateKey() {
+		try {
+			ClassPathResource resource = new ClassPathResource("ticketbell.p8");
+			InputStream inputStream = resource.getInputStream();
+			String privateKey = inputStream.readAllBytes().toString();
+
+			privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "")
+				.replace("-----END PRIVATE KEY-----", "")
+				.replaceAll("\\s", "");
+
+			byte[] privateKeyBytes = Decoders.BASE64.decode(privateKey);
+			
+			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+			KeyFactory keyFactory = KeyFactory.getInstance("EC");
+			return keyFactory.generatePrivate(keySpec);
+		} catch (Exception e) {
+			log.info("[애플 로그인]: PK 생성 실패", e);
 			throw new RuntimeException("애플 로그인 실패");
 		}
 	}
