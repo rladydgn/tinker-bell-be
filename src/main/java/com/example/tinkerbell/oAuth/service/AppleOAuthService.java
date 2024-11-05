@@ -93,13 +93,14 @@ public class AppleOAuthService {
 	}
 
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
+		log.info("[애플 로그인] 유저정보: " + appleTokenResponseDto.toString());
 		Claims claims = Jwts.parser()
+			// 여기 문제
 			.decryptWith(getPrivateKey())
 			.build()
 			.parseSignedClaims(appleTokenResponseDto.getIdToken())
 			.getPayload();
 
-		log.info("[애플 로그인] 유저정보: " + claims.toString());
 		return User.builder()
 			.email(claims.get("email").toString())
 			.provider("apple")
