@@ -71,6 +71,7 @@ public class KaKaoOAuthService {
 
 			// kakao 에서 받은 유저 정보 파싱
 			JsonNode root = objectMapper.readTree(res);
+			log.info("[카카오 유저 정보]: " + root.toString());
 			String nickname = root.path("kakao_account").path("profile").path("nickname").asText();
 			String email = root.path("kakao_account").path("email").asText();
 			return User.builder().nickname(nickname).email(email).provider("kakao").build();

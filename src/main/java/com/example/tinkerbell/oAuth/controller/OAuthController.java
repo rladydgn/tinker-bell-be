@@ -2,6 +2,7 @@ package com.example.tinkerbell.oAuth.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +43,7 @@ public class OAuthController {
 	}
 
 	@Operation(summary = "oauth 애플 로그인 리다이렉트")
-	@GetMapping("/redirect/apple")
+	@PostMapping("/redirect/apple")
 	public void appleRedirect(@RequestParam("code") String code, HttpServletResponse response) throws Exception {
 		String domain = oAuthService.getDomain(feUrl);
 		TokenDto tokenDto = appleOAuthService.getAuthToken(code, domain);
