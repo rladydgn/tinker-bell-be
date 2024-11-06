@@ -91,7 +91,7 @@ public class KaKaoOAuthService {
 		Optional<User> savedUser = userRepository.findByEmailAndProvider(user.getEmail(), "kakao");
 		if (savedUser.isEmpty()) {
 			userRepository.save(user);
-		} else if (savedUser.get().getAuthId() == null) {
+		} else {
 			// auth_id 저장용 로직 추후 삭제
 			savedUser.get().setAuthId(user.getAuthId());
 			userRepository.save(savedUser.get());
