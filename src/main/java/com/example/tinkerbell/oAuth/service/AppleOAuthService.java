@@ -4,6 +4,7 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
+import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -22,6 +23,7 @@ import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.oAuth.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -98,6 +100,9 @@ public class AppleOAuthService {
 
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
 		log.info("[애플 로그인] 유저정보: " + appleTokenResponseDto.toString());
+
+		JwsHeader header = Jwts.parser().build().parseSignedClaims(appleTokenResponseDto.getIdToken()).getHeader();
+		log.info("[애플 로그인 알고리즘]:" + header.getAlgorithm());
 		Claims claims = Jwts.parser()
 			.verifyWith(getSecret())
 			.build()
@@ -145,19 +150,12 @@ public class AppleOAuthService {
 			.baseUrl("https://appleid.apple.com")
 			.build();
 
-		ApplePublicKeyResponseDto applePublicKeyResponseDto = webClient.get()
+		List<ApplePublicKeyResponseDto> applePublicKeyList = webClient.get()
 			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
 			.retrieve()
-			.bodyToMono(ApplePublicKeyResponseDto.class)
+			.bodyToFlux(ApplePublicKeyResponseDto.class)
+			.collectList()
 			.block();
-
-		String test = webClient.get()
-			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
-			.retrieve()
-			.bodyToMono(String.class)
-			.block();
-
-		log.info("[애플 테스트] " + test);
 
 		log.info("[애플 공개키] " + applePublicKeyResponseDto.toString());
 		byte[] bytes = Decoders.BASE64.decode(applePublicKeyResponseDto.getKid());
