@@ -151,6 +151,14 @@ public class AppleOAuthService {
 			.bodyToMono(ApplePublicKeyResponseDto.class)
 			.block();
 
+		String test = webClient.get()
+			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
+			.retrieve()
+			.bodyToMono(String.class)
+			.block();
+
+		log.info("[애플 테스트] " + test);
+
 		log.info("[애플 공개키] " + applePublicKeyResponseDto.toString());
 		byte[] bytes = Decoders.BASE64.decode(applePublicKeyResponseDto.getKid());
 		return Keys.hmacShaKeyFor(bytes);
