@@ -35,6 +35,7 @@ public class OAuthService {
 	public TokenDto makeToken(User user) {
 		String accessToken = Jwts.builder()
 			.subject(UUID.randomUUID().toString())
+			.claim("id", user.getAuthId())
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())
@@ -44,6 +45,7 @@ public class OAuthService {
 
 		String refreshToken = Jwts.builder()
 			.subject(UUID.randomUUID().toString())
+			.claim("id", user.getAuthId())
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
 			.issuedAt(new Date())

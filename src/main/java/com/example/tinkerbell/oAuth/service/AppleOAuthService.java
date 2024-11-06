@@ -5,6 +5,8 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.example.tinkerbell.oAuth.dto.ApplePublicKeyResponseDto;
 import com.example.tinkerbell.oAuth.dto.AppleTokenResponseDto;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.entity.User;
@@ -21,6 +24,7 @@ import com.example.tinkerbell.oAuth.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,13 +50,13 @@ public class AppleOAuthService {
 
 	public AppleTokenResponseDto getAppleToken(String code) {
 		WebClient webClient = WebClient.builder()
-			.baseUrl("https://appleid.apple.com/auth/token")
+			.baseUrl("https://appleid.apple.com")
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
 			.build();
 
 		try {
 			return webClient.post()
-				.uri(uriBuilder -> uriBuilder.path("/oauth/token")
+				.uri(uriBuilder -> uriBuilder.path("/auth/token")
 					.queryParam("grant_type", "authorization_code")
 					.queryParam("client_id", clientId)
 					.queryParam("client_secret", makeClientSecretToken())
@@ -95,8 +99,7 @@ public class AppleOAuthService {
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
 		log.info("[애플 로그인] 유저정보: " + appleTokenResponseDto.toString());
 		Claims claims = Jwts.parser()
-			// 여기 문제
-			.decryptWith(getPrivateKey())
+			.verifyWith(getSecret())
 			.build()
 			.parseSignedClaims(appleTokenResponseDto.getIdToken())
 			.getPayload();
@@ -127,20 +130,7 @@ public class AppleOAuthService {
 
 	private PrivateKey getPrivateKey() {
 		try {
-			// Resource resource = resourceLoader.getResource("ticketbell.txt");
-			// InputStream inputStream = resource.getInputStream();
-			// String privateKey = inputStream.readAllBytes().toString();
-			//
-			// log.info("pk s: " + privateKey);
-			//
-			// privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "")
-			// 	.replace("-----END PRIVATE KEY-----", "")
-			// 	.replaceAll("\\s", "");
-			//
-			// log.info("pk: " + privateKey);
-
 			byte[] privateKeyBytes = Decoders.BASE64.decode(privateKey);
-
 			PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
 			KeyFactory keyFactory = KeyFactory.getInstance("EC");
 			return keyFactory.generatePrivate(keySpec);
@@ -148,5 +138,22 @@ public class AppleOAuthService {
 			log.info("[애플 로그인]: PK 생성 실패", e);
 			throw new RuntimeException("애플 로그인 실패");
 		}
+	}
+
+	private SecretKey getSecret() {
+		WebClient webClient = WebClient.builder()
+			.baseUrl("https://appleid.apple.com")
+			.build();
+
+		ApplePublicKeyResponseDto applePublicKeyResponseDto = webClient.get()
+			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
+			.retrieve()
+			.bodyToMono(ApplePublicKeyResponseDto.class)
+			.block();
+
+		log.info("[애플 공개키] " + applePublicKeyResponseDto.toString());
+		byte[] bytes = Decoders.BASE64.decode(applePublicKeyResponseDto.getKid());
+		return Keys.hmacShaKeyFor(bytes);
+
 	}
 }
