@@ -157,8 +157,8 @@ public class AppleOAuthService {
 			.collectList()
 			.block();
 
-		log.info("[애플 공개키] " + applePublicKeyResponseDto.toString());
-		byte[] bytes = Decoders.BASE64.decode(applePublicKeyResponseDto.getKid());
+		log.info("[애플 공개키] " + applePublicKeyList.toString());
+		byte[] bytes = Decoders.BASE64.decode(applePublicKeyList.get(0).getKid());
 		return Keys.hmacShaKeyFor(bytes);
 
 	}
