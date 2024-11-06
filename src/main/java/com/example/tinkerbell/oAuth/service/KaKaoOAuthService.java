@@ -1,5 +1,7 @@
 package com.example.tinkerbell.oAuth.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -72,6 +74,7 @@ public class KaKaoOAuthService {
 			// kakao 에서 받은 유저 정보 파싱
 			JsonNode root = objectMapper.readTree(res);
 			log.info("[카카오 유저 정보]: " + root.toString());
+			String id = root.path("id").asText();
 			String nickname = root.path("kakao_account").path("profile").path("nickname").asText();
 			String email = root.path("kakao_account").path("email").asText();
 			return User.builder().nickname(nickname).email(email).provider("kakao").build();
@@ -84,8 +87,14 @@ public class KaKaoOAuthService {
 	public TokenDto getAuthToken(String code, String domain) throws Exception {
 		KaKaoTokenResponseDto kaKaoTokenResponseDto = getKaKaoToken(code);
 		User user = getUser(kaKaoTokenResponseDto);
-		if (userRepository.findByEmailAndProvider(user.getEmail(), "kakao").isEmpty()) {
+
+		Optional<User> savedUser = userRepository.findByEmailAndProvider(user.getEmail(), "kakao");
+		if (savedUser.isEmpty()) {
 			userRepository.save(user);
+		} else if (savedUser.get().getAuthId() == null) {
+			// auth_id 저장용 로직 추후 삭제
+			savedUser.get().setAuthId(user.getAuthId());
+			userRepository.save(savedUser.get());
 		}
 
 		TokenDto tokenDto = oAuthService.makeToken(user);

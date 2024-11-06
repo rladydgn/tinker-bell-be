@@ -1,10 +1,14 @@
 package com.example.tinkerbell.oAuth.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -18,4 +22,6 @@ public class User {
 	private String nickname;
 	private String email;
 	private String provider;
+	@Column(name = "auth_id")
+	private String authId;
 }
