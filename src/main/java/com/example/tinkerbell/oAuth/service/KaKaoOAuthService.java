@@ -77,7 +77,7 @@ public class KaKaoOAuthService {
 			String id = root.path("id").asText();
 			String nickname = root.path("kakao_account").path("profile").path("nickname").asText();
 			String email = root.path("kakao_account").path("email").asText();
-			return User.builder().nickname(nickname).email(email).provider("kakao").build();
+			return User.builder().nickname(nickname).email(email).provider("kakao").authId(id).build();
 		} catch (Exception e) {
 			log.error("[카카오 로그인 유저 정보 가져오기 실패] " + e.getMessage());
 			throw e;
@@ -91,7 +91,7 @@ public class KaKaoOAuthService {
 		Optional<User> savedUser = userRepository.findByEmailAndProvider(user.getEmail(), "kakao");
 		if (savedUser.isEmpty()) {
 			userRepository.save(user);
-		} else {
+		} else if (savedUser.get().getAuthId() == null) {
 			// auth_id 저장용 로직 추후 삭제
 			savedUser.get().setAuthId(user.getAuthId());
 			userRepository.save(savedUser.get());
