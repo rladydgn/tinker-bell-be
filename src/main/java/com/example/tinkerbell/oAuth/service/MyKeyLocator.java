@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import com.example.tinkerbell.oAuth.dto.ApplePublicKeyDto;
 
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.LocatorAdapter;
-import io.jsonwebtoken.ProtectedHeader;
 
 public class MyKeyLocator extends LocatorAdapter<Key> {
 	private List<ApplePublicKeyDto> publicKeyList;
@@ -22,7 +22,7 @@ public class MyKeyLocator extends LocatorAdapter<Key> {
 	}
 
 	@Override
-	protected Key locate(ProtectedHeader header) {
+	protected Key locate(JwsHeader header) {
 		System.out.println(header);
 		Optional<ApplePublicKeyDto> optionalPublicKey = publicKeyList.stream().filter(applePublicKey ->
 			applePublicKey.getKid().equals(header.getKeyId())
