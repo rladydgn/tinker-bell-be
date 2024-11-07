@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -150,9 +151,8 @@ public class AppleOAuthService {
 		List<ApplePublicKeyResponseDto> applePublicKeyList = webClient.get()
 			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
 			.retrieve()
-			.bodyToFlux(ApplePublicKeyResponseDto.class)
-			.collectList()
-			.block();
+			.bodyToMono(new ParameterizedTypeReference<List<ApplePublicKeyResponseDto>>() {
+			}).block();
 
 		log.info("[애플 공개키] " + applePublicKeyList.toString());
 		return applePublicKeyList;
