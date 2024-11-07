@@ -23,7 +23,7 @@ public class MyKeyLocator extends LocatorAdapter<Key> {
 
 	@Override
 	protected Key locate(ProtectedHeader header) {
-		String keyId = header.getKeyId();
+		System.out.println(publicKeyList);
 		Optional<ApplePublicKeyResponseDto> optionalPublicKey = publicKeyList.stream().filter(applePublicKey ->
 			applePublicKey.getKid().equals(header.getKeyId())
 		).findFirst();

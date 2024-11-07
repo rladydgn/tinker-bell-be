@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.tinkerbell.exception.dto.ErrorResponseDto;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
@@ -14,6 +17,7 @@ public class GlobalExceptionHandler {
 		ErrorResponseDto errorResponseDto = new ErrorResponseDto();
 		errorResponseDto.setCode(HttpStatus.BAD_REQUEST.value());
 		errorResponseDto.setMessage(exception.getMessage());
+		log.warn("error", exception);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
 	}
 }
