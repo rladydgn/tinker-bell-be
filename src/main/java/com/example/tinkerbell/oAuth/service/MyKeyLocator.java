@@ -9,22 +9,22 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.tinkerbell.oAuth.dto.ApplePublicKeyResponseDto;
+import com.example.tinkerbell.oAuth.dto.ApplePublicKeyDto;
 
 import io.jsonwebtoken.LocatorAdapter;
 import io.jsonwebtoken.ProtectedHeader;
 
 public class MyKeyLocator extends LocatorAdapter<Key> {
-	private List<ApplePublicKeyResponseDto> publicKeyList;
+	private List<ApplePublicKeyDto> publicKeyList;
 
-	public MyKeyLocator(List<ApplePublicKeyResponseDto> publicKeyList) {
+	public MyKeyLocator(List<ApplePublicKeyDto> publicKeyList) {
 		this.publicKeyList = publicKeyList;
 	}
 
 	@Override
 	protected Key locate(ProtectedHeader header) {
 		System.out.println(publicKeyList);
-		Optional<ApplePublicKeyResponseDto> optionalPublicKey = publicKeyList.stream().filter(applePublicKey ->
+		Optional<ApplePublicKeyDto> optionalPublicKey = publicKeyList.stream().filter(applePublicKey ->
 			applePublicKey.getKid().equals(header.getKeyId())
 		).findFirst();
 
@@ -33,7 +33,7 @@ public class MyKeyLocator extends LocatorAdapter<Key> {
 				"일치하는 public key 가 없습니다. " + header.getKeyId() + ", " + publicKeyList.toString());
 		}
 
-		ApplePublicKeyResponseDto publicKey = optionalPublicKey.get();
+		ApplePublicKeyDto publicKey = optionalPublicKey.get();
 
 		BigInteger n = new BigInteger(1, Base64.getUrlDecoder().decode(publicKey.getN()));
 		BigInteger e = new BigInteger(1, Base64.getUrlDecoder().decode(publicKey.getE()));

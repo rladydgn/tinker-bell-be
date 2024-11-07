@@ -3,7 +3,6 @@ package com.example.tinkerbell.oAuth.service;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import com.example.tinkerbell.oAuth.dto.ApplePublicKeyDto;
 import com.example.tinkerbell.oAuth.dto.ApplePublicKeyResponseDto;
 import com.example.tinkerbell.oAuth.dto.AppleTokenResponseDto;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
@@ -143,19 +143,17 @@ public class AppleOAuthService {
 		}
 	}
 
-	private List<ApplePublicKeyResponseDto> getPublicKeys() {
+	private List<ApplePublicKeyDto> getPublicKeys() {
 		WebClient webClient = WebClient.builder()
 			.baseUrl("https://appleid.apple.com")
 			.build();
 
-		Object[] applePublicKeyList = webClient.get()
+		ApplePublicKeyResponseDto applePublicKeyResponseDto = webClient.get()
 			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
 			.retrieve()
-			.bodyToMono(Object[].class).block();
+			.bodyToMono(ApplePublicKeyResponseDto.class).block();
 
-		log.info("[애플 공개키] " + applePublicKeyList.toString());
-		return Arrays.stream(applePublicKeyList)
-			.map(object -> objectMapper.convertValue(object, ApplePublicKeyResponseDto.class))
-			.toList();
+		log.info("[애플 공개키] " + applePublicKeyResponseDto.toString());
+		return applePublicKeyResponseDto.getKeys();
 	}
 }
