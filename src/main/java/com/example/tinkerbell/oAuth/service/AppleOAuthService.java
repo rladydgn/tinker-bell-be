@@ -6,8 +6,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import java.util.List;
 
-import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -23,10 +21,8 @@ import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.oAuth.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,14 +97,15 @@ public class AppleOAuthService {
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
 		log.info("[애플 로그인] 유저정보: " + appleTokenResponseDto.toString());
 
-		JwsHeader header = Jwts.parser().build().parseSignedClaims(appleTokenResponseDto.getIdToken()).getHeader();
-		log.info("[애플 로그인 알고리즘]:" + header.getAlgorithm());
+		MyKeyLocator myKeyLocator = new MyKeyLocator(getPublicKeys());
+
 		Claims claims = Jwts.parser()
-			.verifyWith(getSecret())
+			.keyLocator(myKeyLocator)
 			.build()
 			.parseSignedClaims(appleTokenResponseDto.getIdToken())
 			.getPayload();
 
+		log.info("[애플 로그인] idToken 검증 완료, " + claims.toString());
 		return User.builder()
 			.email(claims.get("email").toString())
 			.provider("apple")
@@ -145,7 +142,7 @@ public class AppleOAuthService {
 		}
 	}
 
-	private SecretKey getSecret() {
+	private List<ApplePublicKeyResponseDto> getPublicKeys() {
 		WebClient webClient = WebClient.builder()
 			.baseUrl("https://appleid.apple.com")
 			.build();
@@ -158,8 +155,6 @@ public class AppleOAuthService {
 			.block();
 
 		log.info("[애플 공개키] " + applePublicKeyList.toString());
-		byte[] bytes = Decoders.BASE64.decode(applePublicKeyList.get(0).getKid());
-		return Keys.hmacShaKeyFor(bytes);
-
+		return applePublicKeyList;
 	}
 }
