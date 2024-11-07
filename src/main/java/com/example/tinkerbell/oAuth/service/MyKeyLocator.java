@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.spec.KeySpec;
-import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class MyKeyLocator extends LocatorAdapter<Key> {
 
 		try {
 			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-			KeySpec keySpec = new RSAPrivateKeySpec(n, e);
+			KeySpec keySpec = new RSAPublicKeySpec(n, e);
 
 			return keyFactory.generatePublic(keySpec);
 		} catch (Exception error) {
