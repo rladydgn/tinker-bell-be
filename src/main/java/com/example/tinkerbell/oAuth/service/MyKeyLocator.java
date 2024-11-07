@@ -44,7 +44,7 @@ public class MyKeyLocator extends LocatorAdapter<Key> {
 
 			return keyFactory.generatePublic(keySpec);
 		} catch (Exception error) {
-			throw new RuntimeException("[애플 로그인] public key 추출 실패", error);
+			throw new RuntimeException("[애플 로그인] public key 추출 실패: " + error.getMessage(), error);
 		}
 
 	}
