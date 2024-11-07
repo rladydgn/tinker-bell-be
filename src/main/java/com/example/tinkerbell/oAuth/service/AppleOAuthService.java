@@ -3,12 +3,11 @@ package com.example.tinkerbell.oAuth.service;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -20,6 +19,7 @@ import com.example.tinkerbell.oAuth.dto.AppleTokenResponseDto;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.oAuth.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -34,7 +34,7 @@ public class AppleOAuthService {
 	private static final long THIRTY_DAYS_MS = 30L * 24L * 60L * 60L * 1000L;
 	private final OAuthService oAuthService;
 	private final UserRepository userRepository;
-	private final ResourceLoader resourceLoader;
+	private final ObjectMapper objectMapper;
 	@Value("${oauth.apple.client-id}")
 	private String clientId;
 	@Value("${oauth.apple.team-id}")
@@ -148,13 +148,14 @@ public class AppleOAuthService {
 			.baseUrl("https://appleid.apple.com")
 			.build();
 
-		List<ApplePublicKeyResponseDto> applePublicKeyList = webClient.get()
+		Object[] applePublicKeyList = webClient.get()
 			.uri(uriBuilder -> uriBuilder.path("/auth/keys").build())
 			.retrieve()
-			.bodyToMono(new ParameterizedTypeReference<List<ApplePublicKeyResponseDto>>() {
-			}).block();
+			.bodyToMono(Object[].class).block();
 
 		log.info("[애플 공개키] " + applePublicKeyList.toString());
-		return applePublicKeyList;
+		return Arrays.stream(applePublicKeyList)
+			.map(object -> objectMapper.convertValue(object, ApplePublicKeyResponseDto.class))
+			.toList();
 	}
 }
