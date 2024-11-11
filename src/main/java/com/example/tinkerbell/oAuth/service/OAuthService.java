@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -34,7 +33,7 @@ public class OAuthService {
 
 	public TokenDto makeToken(User user) {
 		String accessToken = Jwts.builder()
-			.subject(UUID.randomUUID().toString())
+			.subject(user.getAuthId())
 			.claim("id", user.getAuthId())
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
@@ -44,7 +43,7 @@ public class OAuthService {
 			.compact();
 
 		String refreshToken = Jwts.builder()
-			.subject(UUID.randomUUID().toString())
+			.subject(user.getAuthId())
 			.claim("id", user.getAuthId())
 			.claim("email", user.getEmail())
 			.claim("provider", user.getProvider())
@@ -81,7 +80,7 @@ public class OAuthService {
 			.parseSignedClaims(token)
 			.getPayload();
 
-		return this.userRepository.findByEmailAndProvider(claims.get("email").toString(),
+		return this.userRepository.findByAuthIdAndProvider(claims.getSubject(),
 				claims.get("provider").toString())
 			.orElseThrow(() -> new ValidationException("유저를 찾을 수 없습니다."));
 	}

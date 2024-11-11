@@ -74,7 +74,7 @@ public class AppleOAuthService {
 		AppleTokenResponseDto appleTokenDto = getAppleToken(code);
 		User user = getUser(appleTokenDto);
 
-		if (userRepository.findByEmailAndProvider(user.getEmail(), user.getProvider()).isEmpty()) {
+		if (userRepository.findByAuthIdAndProvider(user.getAuthId(), user.getProvider()).isEmpty()) {
 			userRepository.save(user);
 		}
 
@@ -96,8 +96,6 @@ public class AppleOAuthService {
 	}
 
 	public User getUser(AppleTokenResponseDto appleTokenResponseDto) {
-		log.info("[애플 로그인] 유저정보: " + appleTokenResponseDto.toString());
-
 		MyKeyLocator myKeyLocator = new MyKeyLocator(getPublicKeys());
 
 		Claims claims = Jwts.parser()
@@ -106,9 +104,11 @@ public class AppleOAuthService {
 			.parseSignedClaims(appleTokenResponseDto.getIdToken())
 			.getPayload();
 
-		log.info("[애플 로그인] idToken 검증 완료, " + claims.toString());
+		log.info("[애플 로그인] idToken 검증 완료: " + claims.toString());
+
 		return User.builder()
-			.email(claims.get("email").toString())
+			.email(claims.get("email", String.class))
+			.authId(claims.getSubject())
 			.provider("apple")
 			.build();
 	}
@@ -138,7 +138,7 @@ public class AppleOAuthService {
 			KeyFactory keyFactory = KeyFactory.getInstance("EC");
 			return keyFactory.generatePrivate(keySpec);
 		} catch (Exception e) {
-			log.info("[애플 로그인]: PK 생성 실패", e);
+			log.info("[애플 로그인] PK 생성 실패", e);
 			throw new RuntimeException("애플 로그인 실패");
 		}
 	}
@@ -153,7 +153,6 @@ public class AppleOAuthService {
 			.retrieve()
 			.bodyToMono(ApplePublicKeyResponseDto.class).block();
 
-		log.info("[애플 공개키] " + applePublicKeyResponseDto.toString());
 		return applePublicKeyResponseDto.getKeys();
 	}
 }
