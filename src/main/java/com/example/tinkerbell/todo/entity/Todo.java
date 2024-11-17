@@ -42,6 +42,6 @@ public class Todo {
 	private LocalDateTime updatedAt;
 	@Column
 	private LocalDateTime date;
-	@Column
-	private Integer order;
+	// @Column(name = "order")
+	// private Integer order;
 }

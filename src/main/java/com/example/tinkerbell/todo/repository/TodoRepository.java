@@ -1,5 +1,6 @@
 package com.example.tinkerbell.todo.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,7 @@ import com.example.tinkerbell.todo.entity.Todo;
 
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, Integer> {
-	List<Todo> findAllByUserIdOrderByOrderAsc(int userId);
+	List<Todo> findAllByUserIdAndDateBetween(int userId, LocalDateTime startDate, LocalDateTime endDate);
 
 	Optional<Todo> findByIdAndUserId(int id, int userId);
 }

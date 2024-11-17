@@ -1,5 +1,6 @@
 package com.example.tinkerbell.todo.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,18 @@ public class TodoController {
 		return ResponseEntity.ok(todoService.getTodo(id, user));
 	}
 
-	@Operation(summary = "유저의 todo 목록 조회")
+	@Operation(summary = "유저의 todo 목록 조회", description = "from 보다 크거나 작고, to 보다 작거나 같은 날짜의 todo 를 구한다. "
+		+ "from, to 를 입력하지 않을 경우 자동으로 각각 서버기준 오늘 날짜가 들어간다.")
 	@GetMapping
-	public ResponseEntity<List<TodoDto.Response>> getTodoList(@Parameter(hidden = true) @Login User user) {
-		return ResponseEntity.ok(todoService.getTodoList(user));
+	public ResponseEntity<List<TodoDto.Response>> getTodoList(@Parameter(hidden = true) @Login User user,
+		TodoDto.Query todoQuery) {
+		if (todoQuery.getFrom() == null) {
+			todoQuery.setFrom(LocalDate.now());
+		}
+		if (todoQuery.getTo() == null) {
+			todoQuery.setTo(LocalDate.now());
+		}
+		return ResponseEntity.ok(todoService.getTodoList(user, todoQuery));
 	}
 
 	@Operation(summary = "todo 생성")

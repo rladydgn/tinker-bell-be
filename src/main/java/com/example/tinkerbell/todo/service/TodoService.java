@@ -1,5 +1,7 @@
 package com.example.tinkerbell.todo.service;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -21,8 +23,12 @@ public class TodoService {
 	private final ModelMapper modelMapper;
 
 	@Transactional(readOnly = true)
-	public List<TodoDto.Response> getTodoList(User user) {
-		List<Todo> todoList = todoRepository.findAllByUserIdOrderByOrderAsc(user.getId());
+	public List<TodoDto.Response> getTodoList(User user, TodoDto.Query todoQuery) {
+		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
+		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.MAX);
+
+		List<Todo> todoList = todoRepository.findAllByUserIdAndDateBetween(user.getId(),
+			from, to);
 		return todoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList();
 	}
 
@@ -86,7 +92,7 @@ public class TodoService {
 				throw new ValidationException("todo 의 소유자가 아닙니다. id: " + todo.getId());
 			}
 
-			todo.setOrder(order.getOrder());
+			// todo.setOrder(order.getOrder());
 			todoRepository.save(todo);
 		});
 	}
