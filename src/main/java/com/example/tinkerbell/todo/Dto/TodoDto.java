@@ -18,7 +18,7 @@ public class TodoDto {
 	public static class Request {
 		private String title;
 		private LocalDateTime date;
-		private int order;
+		private Integer order;
 	}
 
 	@Setter
