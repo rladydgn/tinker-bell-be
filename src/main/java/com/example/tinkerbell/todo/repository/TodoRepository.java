@@ -10,7 +10,7 @@ import com.example.tinkerbell.todo.entity.Todo;
 
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, Integer> {
-	List<Todo> findAllByUserId(int userId);
+	List<Todo> findAllByUserIdOrderByOrderAsc(int userId);
 
 	Optional<Todo> findByIdAndUserId(int id, int userId);
 }

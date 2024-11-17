@@ -42,4 +42,6 @@ public class Todo {
 	private LocalDateTime updatedAt;
 	@Column
 	private LocalDateTime date;
+	@Column
+	private int order;
 }

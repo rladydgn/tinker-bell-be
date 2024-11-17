@@ -1,6 +1,7 @@
 package com.example.tinkerbell.todo.Dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,6 +15,20 @@ public class TodoDto {
 	public static class Request {
 		private String title;
 		private LocalDateTime date;
+		private int order;
+	}
+
+	@Setter
+	@Getter
+	public static class Order {
+		private int id;
+		private int order;
+	}
+
+	@Setter
+	@Getter
+	public static class OrderRequest {
+		private List<Order> orderList;
 	}
 
 	@Setter

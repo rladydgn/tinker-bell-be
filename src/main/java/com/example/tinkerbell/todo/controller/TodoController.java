@@ -66,10 +66,18 @@ public class TodoController {
 	}
 
 	@Operation(summary = "todo 완료 상태 변경")
-	@PatchMapping(value = "completion/{id}")
+	@PatchMapping(value = "/completion/{id}")
 	public ResponseEntity<Void> changeTodoIsCompleted(@PathVariable int id,
 		@RequestBody TodoDto.IsCompletedRequest todoIsCompletedDto, @Parameter(hidden = true) @Login User user) {
 		todoService.changeTodoIsCompleted(id, todoIsCompletedDto, user);
+		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "todo 순서 저장")
+	@PutMapping(value = "/orders")
+	public ResponseEntity<Void> changeTodoOrder(@RequestBody TodoDto.OrderRequest orderRequest,
+		@Parameter(hidden = true) @Login User user) {
+		todoService.changeTodoOrder(orderRequest, user);
 		return ResponseEntity.ok().build();
 	}
 }

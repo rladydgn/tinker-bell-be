@@ -22,7 +22,7 @@ public class TodoService {
 
 	@Transactional(readOnly = true)
 	public List<TodoDto.Response> getTodoList(User user) {
-		List<Todo> todoList = todoRepository.findAllByUserId(user.getId());
+		List<Todo> todoList = todoRepository.findAllByUserIdOrderByOrderAsc(user.getId());
 		return todoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList();
 	}
 
@@ -74,6 +74,21 @@ public class TodoService {
 
 		todo.setCompleted(todoIsCompletedDto.isCompleted());
 		todoRepository.save(todo);
+	}
+
+	@Transactional
+	public void changeTodoOrder(TodoDto.OrderRequest orderRequest, User user) {
+		orderRequest.getOrderList().stream().forEach(order -> {
+			Todo todo = todoRepository.findById(order.getId())
+				.orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
+
+			if (!isTodoOwner(todo, user)) {
+				throw new ValidationException("todo 의 소유자가 아닙니다. id: " + todo.getId());
+			}
+
+			todo.setOrder(order.getOrder());
+			todoRepository.save(todo);
+		});
 	}
 
 	private boolean isTodoOwner(Todo todo, User user) {
