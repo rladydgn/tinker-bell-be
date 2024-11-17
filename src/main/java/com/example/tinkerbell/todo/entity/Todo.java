@@ -43,5 +43,5 @@ public class Todo {
 	@Column
 	private LocalDateTime date;
 	@Column
-	private int order;
+	private Integer order;
 }
