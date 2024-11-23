@@ -18,10 +18,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Setter
 @Getter
+@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class Todo {
 	@Id
@@ -42,6 +44,6 @@ public class Todo {
 	private LocalDateTime updatedAt;
 	@Column
 	private LocalDateTime date;
-	// @Column(name = "order")
-	// private Integer order;
+	@Column(name = "`order`")
+	private int order;
 }

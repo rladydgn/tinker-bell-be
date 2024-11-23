@@ -3,6 +3,7 @@ package com.example.tinkerbell.todo.service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class TodoService {
 		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
 		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.MAX);
 
-		List<Todo> todoList = todoRepository.findAllByUserIdAndDateBetween(user.getId(),
+		List<Todo> todoList = todoRepository.findAllByUserIdAndDateBetweenOrderByOrderAsc(user.getId(),
 			from, to);
 		return todoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList();
 	}
@@ -43,6 +44,18 @@ public class TodoService {
 	public TodoDto.Response saveTodo(TodoDto.Request todoDto, User user) {
 		Todo todo = modelMapper.map(todoDto, Todo.class);
 		todo.setUser(user);
+
+		LocalDateTime from = todoDto.getDate().toLocalDate().atStartOfDay();
+		LocalDateTime to = todoDto.getDate().toLocalDate().atTime(LocalTime.MAX);
+		Optional<Todo> maxOrderTodo = todoRepository.findFirstByUserIdAndDateBetweenOrderByOrderDesc(user.getId(), from,
+			to);
+		if (maxOrderTodo.isEmpty()) {
+			System.out.println("empty");
+			todo.setOrder(0);
+		} else {
+			System.out.println(maxOrderTodo.get());
+			todo.setOrder(maxOrderTodo.get().getOrder() + 1);
+		}
 		return modelMapper.map(todoRepository.save(todo), TodoDto.Response.class);
 	}
 
@@ -92,7 +105,7 @@ public class TodoService {
 				throw new ValidationException("todo 의 소유자가 아닙니다. id: " + todo.getId());
 			}
 
-			// todo.setOrder(order.getOrder());
+			todo.setOrder(order.getOrder());
 			todoRepository.save(todo);
 		});
 	}

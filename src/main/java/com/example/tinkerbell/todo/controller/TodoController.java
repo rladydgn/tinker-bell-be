@@ -37,7 +37,7 @@ public class TodoController {
 	}
 
 	@Operation(summary = "유저의 todo 목록 조회", description = "from 보다 크거나 작고, to 보다 작거나 같은 날짜의 todo 를 구한다. "
-		+ "from, to 를 입력하지 않을 경우 자동으로 각각 서버기준 오늘 날짜가 들어간다.")
+		+ "from, to 를 입력하지 않을 경우 자동으로 각각 서버기준 오늘 날짜가 들어간다. order 기준 오름차순으로 정렬된다.")
 	@GetMapping
 	public ResponseEntity<List<TodoDto.Response>> getTodoList(@Parameter(hidden = true) @Login User user,
 		TodoDto.Query todoQuery) {
@@ -82,7 +82,7 @@ public class TodoController {
 		return ResponseEntity.ok().build();
 	}
 
-	@Operation(summary = "todo 순서 저장")
+	@Operation(summary = "todo 순서 저장", description = "목록의 순서를 정렬한다. 데이터는 order 오름차순으로 정렬된다.")
 	@PutMapping(value = "/orders")
 	public ResponseEntity<Void> changeTodoOrder(@RequestBody TodoDto.OrderRequest orderRequest,
 		@Parameter(hidden = true) @Login User user) {
