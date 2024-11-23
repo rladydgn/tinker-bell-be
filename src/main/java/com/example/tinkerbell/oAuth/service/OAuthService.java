@@ -10,6 +10,8 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.example.tinkerbell.oAuth.dto.AccessTokenDto;
+import com.example.tinkerbell.oAuth.dto.RefreshTokenDto;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.oAuth.repository.UserRepository;
@@ -100,5 +102,16 @@ public class OAuthService {
 	public String getDomain(String url) throws URISyntaxException {
 		URI uri = new URI(url);
 		return uri.getHost().replace("www", "");
+	}
+
+	public AccessTokenDto renewAccessToken(RefreshTokenDto refreshTokenDto) {
+		if (verifyToken(refreshTokenDto.getRefreshToken())) {
+			User user = getUserFromToken(refreshTokenDto.getRefreshToken());
+			TokenDto tokenDto = makeToken(user);
+			AccessTokenDto accessTokenDto = new AccessTokenDto();
+			accessTokenDto.setAccessToken(tokenDto.getAccessToken());
+			return accessTokenDto;
+		}
+		throw new RuntimeException("유효하지 않은 refresh token 입니다. :" + refreshTokenDto);
 	}
 }
