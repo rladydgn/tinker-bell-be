@@ -26,7 +26,9 @@ public class TodoService {
 	@Transactional(readOnly = true)
 	public List<TodoDto.Response> getTodoList(User user, TodoDto.Query todoQuery) {
 		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
-		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.MAX);
+		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.of(23, 59, 59));
+		System.out.println(from);
+		System.out.println(to);
 
 		List<Todo> todoList = todoRepository.findAllByUserIdAndDateBetweenOrderByOrderAsc(user.getId(),
 			from, to);
@@ -46,7 +48,7 @@ public class TodoService {
 		todo.setUser(user);
 
 		LocalDateTime from = todoDto.getDate().toLocalDate().atStartOfDay();
-		LocalDateTime to = todoDto.getDate().toLocalDate().atTime(LocalTime.MAX);
+		LocalDateTime to = todoDto.getDate().toLocalDate().atTime(LocalTime.of(23, 59, 59));
 		Optional<Todo> maxOrderTodo = todoRepository.findFirstByUserIdAndDateBetweenOrderByOrderDesc(user.getId(), from,
 			to);
 		if (maxOrderTodo.isEmpty()) {
