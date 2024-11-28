@@ -24,15 +24,24 @@ public class TodoService {
 	private final ModelMapper modelMapper;
 
 	@Transactional(readOnly = true)
-	public List<TodoDto.Response> getTodoList(User user, TodoDto.Query todoQuery) {
+	public TodoDto.ListResponse getTodoList(User user, TodoDto.Query todoQuery) {
 		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
 		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.of(23, 59, 59));
 		System.out.println(from);
 		System.out.println(to);
 
-		List<Todo> todoList = todoRepository.findAllByUserIdAndDateBetweenOrderByOrderAsc(user.getId(),
+		List<Todo> completedTodoList = todoRepository.findAllByUserIdAndIsCompletedAndDateBetweenOrderByOrderAsc(
+			user.getId(), true,
 			from, to);
-		return todoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList();
+		List<Todo> incompletedTodoList = todoRepository.findAllByUserIdAndIsCompletedAndDateBetweenOrderByOrderAsc(
+			user.getId(), false, from, to);
+
+		TodoDto.ListResponse listResponse = new TodoDto.ListResponse();
+		listResponse.setCompletedTodoList(
+			completedTodoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList());
+		listResponse.setIncompletedTodoList(
+			incompletedTodoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList());
+		return listResponse;
 	}
 
 	@Transactional(readOnly = true)

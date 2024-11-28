@@ -1,7 +1,6 @@
 package com.example.tinkerbell.todo.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +38,7 @@ public class TodoController {
 	@Operation(summary = "유저의 todo 목록 조회", description = "from 보다 크거나 작고, to 보다 작거나 같은 날짜의 todo 를 구한다. "
 		+ "from, to 를 입력하지 않을 경우 자동으로 각각 서버기준 오늘 날짜가 들어간다. order 기준 오름차순으로 정렬된다.")
 	@GetMapping
-	public ResponseEntity<List<TodoDto.Response>> getTodoList(@Parameter(hidden = true) @Login User user,
+	public ResponseEntity<TodoDto.ListResponse> getTodoList(@Parameter(hidden = true) @Login User user,
 		TodoDto.Query todoQuery) {
 		if (todoQuery.getFrom() == null) {
 			todoQuery.setFrom(LocalDate.now());
