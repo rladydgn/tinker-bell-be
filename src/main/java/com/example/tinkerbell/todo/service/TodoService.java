@@ -58,8 +58,9 @@ public class TodoService {
 
 		LocalDateTime from = todoDto.getDate().toLocalDate().atStartOfDay();
 		LocalDateTime to = todoDto.getDate().toLocalDate().atTime(LocalTime.of(23, 59, 59));
-		Optional<Todo> maxOrderTodo = todoRepository.findFirstByUserIdAndDateBetweenOrderByOrderDesc(user.getId(), from,
-			to);
+		Optional<Todo> maxOrderTodo = todoRepository.findFirstByUserIdAndIsCompletedAndDateBetweenOrderByOrderDesc(
+			user.getId(), false, from, to);
+		
 		if (maxOrderTodo.isEmpty()) {
 			System.out.println("empty");
 			todo.setOrder(0);

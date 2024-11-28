@@ -20,4 +20,8 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
 
 	Optional<Todo> findFirstByUserIdAndDateBetweenOrderByOrderDesc(int userId, LocalDateTime startDate,
 		LocalDateTime endDate);
+
+	Optional<Todo> findFirstByUserIdAndIsCompletedAndDateBetweenOrderByOrderDesc(int userId, boolean isCompleted,
+		LocalDateTime startDate,
+		LocalDateTime endDate);
 }
