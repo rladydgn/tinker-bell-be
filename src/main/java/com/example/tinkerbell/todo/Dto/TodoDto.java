@@ -42,6 +42,13 @@ public class TodoDto {
 
 	@Setter
 	@Getter
+	public static class ListResponse {
+		private List<Response> completedTodoList;
+		private List<Response> incompletedTodoList;
+	}
+
+	@Setter
+	@Getter
 	public static class Response {
 		private int id;
 		private String title;
