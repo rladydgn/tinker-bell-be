@@ -2,7 +2,10 @@ package com.example.tinkerbell.oAuth.controller;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenController {
 	private final OAuthService oAuthService;
+	@Value("${fe.url}")
+	private String feUrl;
 
 	@Operation(summary = "토큰 검증", description = "토큰 검증")
 	@GetMapping("/verify")
@@ -37,7 +42,20 @@ public class TokenController {
 
 	@Operation(summary = "accessToken 재발급")
 	@PostMapping("/renew")
-	public ResponseEntity<AccessTokenDto> renewAccessToken(@RequestBody RefreshTokenDto refreshTokenDto) {
-		return ResponseEntity.ok().body(oAuthService.renewAccessToken(refreshTokenDto));
+	public ResponseEntity<AccessTokenDto> renewAccessToken(@RequestBody RefreshTokenDto refreshTokenDto) throws
+		Exception {
+
+		String domain = oAuthService.getDomain(feUrl);
+		String accessToken = ResponseCookie.from("accessToken",
+				oAuthService.renewAccessToken(refreshTokenDto).getAccessToken())
+			.domain(domain)
+			.path("/")
+			.httpOnly(true)
+			.build()
+			.toString();
+
+		return ResponseEntity.ok()
+			.header(HttpHeaders.SET_COOKIE, accessToken)
+			.build();
 	}
 }
