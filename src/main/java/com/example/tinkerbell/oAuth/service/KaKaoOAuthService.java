@@ -33,6 +33,7 @@ public class KaKaoOAuthService {
 	private String redirectUrl;
 	@Value("${jwt.secret}")
 	private String secret;
+	private static final long THIRTY_DAYS_MS = 30L * 24L * 60L * 60L * 1000L;
 
 	public KaKaoTokenResponseDto getKaKaoToken(String code) {
 		WebClient webClient = WebClient.builder()
@@ -102,12 +103,14 @@ public class KaKaoOAuthService {
 		tokenDto.setAccessToken(ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 			.domain(domain)
 			.path("/")
+			.maxAge(THIRTY_DAYS_MS)
 			.build()
 			.toString());
 
 		tokenDto.setRefreshToken(ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 			.domain(domain)
 			.path("/")
+			.maxAge(THIRTY_DAYS_MS * 3)
 			.build()
 			.toString());
 

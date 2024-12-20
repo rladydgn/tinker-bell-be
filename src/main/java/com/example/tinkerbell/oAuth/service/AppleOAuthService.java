@@ -83,12 +83,14 @@ public class AppleOAuthService {
 		tokenDto.setAccessToken(ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 			.domain(domain)
 			.path("/")
+			.maxAge(THIRTY_DAYS_MS)
 			.build()
 			.toString());
 
 		tokenDto.setRefreshToken(ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 			.domain(domain)
 			.path("/")
+			.maxAge(THIRTY_DAYS_MS * 3)
 			.build()
 			.toString());
 
