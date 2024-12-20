@@ -8,9 +8,9 @@ import java.util.Objects;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
-import com.example.tinkerbell.oAuth.dto.AccessTokenDto;
 import com.example.tinkerbell.oAuth.dto.RefreshTokenDto;
 import com.example.tinkerbell.oAuth.dto.TokenDto;
 import com.example.tinkerbell.oAuth.entity.User;
@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OAuthService {
 	private static final long THIRTY_DAYS_MS = 30L * 24L * 60L * 60L * 1000L;
+	private static final long THIRTY_DAYS_SECOND = 30L * 24L * 60L * 60L;
 	@Value("${jwt.secret}")
 	private String secret;
 	private final UserRepository userRepository;
@@ -104,13 +105,16 @@ public class OAuthService {
 		return uri.getHost().replace("www", "");
 	}
 
-	public AccessTokenDto renewAccessToken(RefreshTokenDto refreshTokenDto) {
+	public String renewAccessToken(RefreshTokenDto refreshTokenDto, String domain) {
 		if (verifyToken(refreshTokenDto.getRefreshToken())) {
 			User user = getUserFromToken(refreshTokenDto.getRefreshToken());
 			TokenDto tokenDto = makeToken(user);
-			AccessTokenDto accessTokenDto = new AccessTokenDto();
-			accessTokenDto.setAccessToken(tokenDto.getAccessToken());
-			return accessTokenDto;
+			return ResponseCookie.from("accessToken", tokenDto.getAccessToken())
+				.domain(domain)
+				.path("/")
+				.maxAge(THIRTY_DAYS_SECOND)
+				.build()
+				.toString();
 		}
 		throw new RuntimeException("유효하지 않은 refresh token 입니다. :" + refreshTokenDto);
 	}
