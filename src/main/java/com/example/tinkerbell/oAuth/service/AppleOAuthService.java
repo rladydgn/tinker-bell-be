@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AppleOAuthService {
 	private static final long THIRTY_DAYS_MS = 30L * 24L * 60L * 60L * 1000L;
+	private static final long THIRTY_DAYS_SECOND = 30L * 24L * 60L * 60L;
 	private final OAuthService oAuthService;
 	private final UserRepository userRepository;
 	private final ObjectMapper objectMapper;
@@ -83,14 +84,14 @@ public class AppleOAuthService {
 		tokenDto.setAccessToken(ResponseCookie.from("accessToken", tokenDto.getAccessToken())
 			.domain(domain)
 			.path("/")
-			.maxAge(THIRTY_DAYS_MS)
+			.maxAge(THIRTY_DAYS_SECOND)
 			.build()
 			.toString());
 
 		tokenDto.setRefreshToken(ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
 			.domain(domain)
 			.path("/")
-			.maxAge(THIRTY_DAYS_MS * 3)
+			.maxAge(THIRTY_DAYS_SECOND * 3)
 			.build()
 			.toString());
 
