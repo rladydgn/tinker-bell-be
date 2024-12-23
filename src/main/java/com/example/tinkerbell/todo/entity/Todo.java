@@ -46,4 +46,6 @@ public class Todo {
 	private LocalDateTime date;
 	@Column(name = "`order`")
 	private int order;
+	@Column(name = "description")
+	private String description;
 }

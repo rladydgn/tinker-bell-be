@@ -18,6 +18,7 @@ public class TodoDto {
 	public static class Request {
 		private String title;
 		private LocalDateTime date;
+		private String description;
 	}
 
 	@Setter
@@ -56,6 +57,7 @@ public class TodoDto {
 		private boolean isCompleted;
 		private LocalDateTime date;
 		private Integer order;
+		private String description;
 	}
 
 	@Setter
