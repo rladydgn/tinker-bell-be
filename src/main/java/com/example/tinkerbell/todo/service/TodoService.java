@@ -27,14 +27,14 @@ public class TodoService {
 	public TodoDto.ListResponse getTodoList(User user, TodoDto.Query todoQuery) {
 		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
 		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.of(23, 59, 59));
-		System.out.println(from);
-		System.out.println(to);
 
 		List<Todo> completedTodoList = todoRepository.findAllByUserIdAndIsCompletedAndDateBetweenOrderByOrderAsc(
 			user.getId(), true,
 			from, to);
 		List<Todo> incompletedTodoList = todoRepository.findAllByUserIdAndIsCompletedAndDateBetweenOrderByOrderAsc(
 			user.getId(), false, from, to);
+
+		System.out.println(incompletedTodoList);
 
 		TodoDto.ListResponse listResponse = new TodoDto.ListResponse();
 		listResponse.setCompletedTodoList(

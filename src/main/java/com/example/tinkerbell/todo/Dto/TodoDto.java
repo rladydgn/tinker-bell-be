@@ -2,6 +2,7 @@ package com.example.tinkerbell.todo.Dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -58,6 +59,7 @@ public class TodoDto {
 		private LocalDateTime date;
 		private Integer order;
 		private String description;
+		private List<CategoryDto.Response> categoryList = new ArrayList<>();
 	}
 
 	@Setter
