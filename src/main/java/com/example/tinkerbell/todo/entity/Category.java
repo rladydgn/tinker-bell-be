@@ -1,8 +1,6 @@
 package com.example.tinkerbell.todo.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,26 +15,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Setter
 @Getter
-@ToString
 @EntityListeners(AuditingEntityListener.class)
-public class Todo {
+public class Category {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@Column(name = "is_completed")
-	private boolean isCompleted;
-	@Column
-	private String title;
+
+	@Column(name = "name")
+	private String name;
+	@Column(name = "color")
+	private String color;
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
@@ -46,17 +41,4 @@ public class Todo {
 	@LastModifiedDate
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
-	@Column
-	private LocalDateTime date;
-	@Column(name = "`order`")
-	private int order;
-	@Column(name = "description")
-	private String description;
-	@ManyToMany
-	@JoinTable(
-		name = "user_category",
-		joinColumns = @JoinColumn(name = "todo_id"),
-		inverseJoinColumns = @JoinColumn(name = "category_id")
-	)
-	private List<Category> categoryList = new ArrayList<>();
 }
