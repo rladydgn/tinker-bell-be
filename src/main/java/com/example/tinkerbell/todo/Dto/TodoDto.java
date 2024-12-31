@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,6 +52,7 @@ public class TodoDto {
 
 	@Setter
 	@Getter
+	@Schema(name = "TodoResponse")
 	public static class Response {
 		private int id;
 		private String title;
