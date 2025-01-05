@@ -1,6 +1,7 @@
 package com.example.tinkerbell.oAuth.controller;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,5 +53,17 @@ public class OAuthController {
 		response.addHeader("set-Cookie", tokenDto.getRefreshToken());
 
 		response.sendRedirect(feUrl);
+	}
+
+	@Operation
+	@GetMapping("/logout")
+	public ResponseEntity<Void> logout(HttpServletResponse response) {
+
+		TokenDto tokenDto = oAuthService.clearCookie();
+
+		response.addHeader("set-Cookie", tokenDto.getAccessToken());
+		response.addHeader("set-Cookie", tokenDto.getRefreshToken());
+
+		return ResponseEntity.ok().build();
 	}
 }

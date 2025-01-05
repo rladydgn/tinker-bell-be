@@ -118,4 +118,24 @@ public class OAuthService {
 		}
 		throw new RuntimeException("유효하지 않은 refresh token 입니다. :" + refreshTokenDto);
 	}
+
+	public TokenDto clearCookie() {
+		TokenDto tokenDto = TokenDto.builder().build();
+		String accessToken = ResponseCookie.from("accessToken", "")
+			.path("/")
+			.maxAge(0)
+			.build()
+			.toString();
+
+		String refreshToken = ResponseCookie.from("refreshToken", "")
+			.path("/")
+			.maxAge(0)
+			.build()
+			.toString();
+
+		tokenDto.setAccessToken(accessToken);
+		tokenDto.setRefreshToken(refreshToken);
+
+		return tokenDto;
+	}
 }
