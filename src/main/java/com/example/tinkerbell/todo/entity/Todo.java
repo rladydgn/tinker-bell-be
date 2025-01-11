@@ -54,7 +54,7 @@ public class Todo {
 	private String description;
 	@ManyToMany
 	@JoinTable(
-		name = "user_category",
+		name = "todo_category",
 		joinColumns = @JoinColumn(name = "todo_id"),
 		inverseJoinColumns = @JoinColumn(name = "category_id")
 	)

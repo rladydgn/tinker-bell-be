@@ -21,6 +21,7 @@ public class TodoDto {
 		private String title;
 		private LocalDateTime date;
 		private String description;
+		private List<Integer> categoryIdList;
 	}
 
 	@Setter

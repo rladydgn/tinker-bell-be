@@ -11,6 +11,7 @@ import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.todo.Dto.CategoryDto;
 import com.example.tinkerbell.todo.entity.Category;
 import com.example.tinkerbell.todo.repository.CategoryRepository;
+import com.example.tinkerbell.todo.repository.TodoCategoryRepository;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryService {
 	private final CategoryRepository categoryRepository;
 	private final ModelMapper modelMapper;
+	private final TodoCategoryRepository todoCategoryRepository;
 
 	@Transactional
 	public CategoryDto.Response saveCategory(CategoryDto.Request categoryDto, User user) {
@@ -57,5 +59,6 @@ public class CategoryService {
 		Category category = categoryRepository.findByIdAndUserId(id, user.getId())
 			.orElseThrow(() -> new ValidationException("찾을 수 없는 카테고리 입니다."));
 		categoryRepository.delete(category);
+		todoCategoryRepository.deleteByCategoryId(category.getId());
 	}
 }

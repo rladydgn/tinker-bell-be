@@ -2,6 +2,7 @@ package com.example.tinkerbell.todo.service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.tinkerbell.oAuth.entity.User;
 import com.example.tinkerbell.todo.Dto.TodoDto;
+import com.example.tinkerbell.todo.entity.Category;
 import com.example.tinkerbell.todo.entity.Todo;
+import com.example.tinkerbell.todo.repository.CategoryRepository;
+import com.example.tinkerbell.todo.repository.TodoCategoryRepository;
 import com.example.tinkerbell.todo.repository.TodoRepository;
 
 import jakarta.validation.ValidationException;
@@ -22,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 public class TodoService {
 	private final TodoRepository todoRepository;
 	private final ModelMapper modelMapper;
+	private final CategoryRepository categoryRepository;
+	private final TodoCategoryRepository todoCategoryRepository;
 
 	@Transactional(readOnly = true)
 	public TodoDto.ListResponse getTodoList(User user, TodoDto.Query todoQuery) {
@@ -53,9 +59,22 @@ public class TodoService {
 
 	@Transactional
 	public TodoDto.Response saveTodo(TodoDto.Request todoDto, User user) {
-		Todo todo = modelMapper.map(todoDto, Todo.class);
+		Todo todo = new Todo();
+		todo.setTitle(todoDto.getTitle());
+		todo.setDate(todoDto.getDate());
+		todo.setDescription(todoDto.getDescription());
 		todo.setUser(user);
 
+		// 카테고리 가져오기
+		List<Category> categoryList = new ArrayList<>();
+		todoDto.getCategoryIdList().stream().forEach(categoryId -> categoryList.add(
+			categoryRepository.findByIdAndUserId(categoryId, user.getId())
+				.orElseThrow(() -> new ValidationException("찾을 수 없는 카테고리 입니다."))
+		));
+
+		todo.setCategoryList(categoryList);
+
+		// 순서 설정
 		LocalDateTime from = todoDto.getDate().toLocalDate().atStartOfDay();
 		LocalDateTime to = todoDto.getDate().toLocalDate().atTime(LocalTime.of(23, 59, 59));
 		Optional<Todo> maxOrderTodo = todoRepository.findFirstByUserIdAndIsCompletedAndDateBetweenOrderByOrderDesc(
@@ -68,6 +87,7 @@ public class TodoService {
 			System.out.println(maxOrderTodo.get());
 			todo.setOrder(maxOrderTodo.get().getOrder() + 1);
 		}
+
 		return modelMapper.map(todoRepository.save(todo), TodoDto.Response.class);
 	}
 
@@ -97,6 +117,15 @@ public class TodoService {
 			}
 		}
 		todo.setDate(todoDto.getDate());
+
+		// 카테고리 수정
+		List<Category> categoryList = new ArrayList<>();
+		todoDto.getCategoryIdList().stream().forEach(categoryId -> categoryList.add(
+			categoryRepository.findByIdAndUserId(categoryId, user.getId())
+				.orElseThrow(() -> new ValidationException("찾을 수 없는 카테고리 입니다."))
+		));
+		todo.setCategoryList(categoryList);
+
 		todoRepository.save(todo);
 	}
 
