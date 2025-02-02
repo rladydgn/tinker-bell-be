@@ -62,7 +62,7 @@ public class TodoDto {
 		private LocalDateTime date;
 		private Integer order;
 		private String description;
-		private List<CategoryDto.Response> categoryIdList = new ArrayList<>();
+		private List<CategoryDto.Response> categoryList = new ArrayList<>();
 	}
 
 	@Setter
