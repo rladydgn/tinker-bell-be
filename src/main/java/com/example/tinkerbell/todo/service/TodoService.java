@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.tinkerbell.oAuth.entity.User;
-import com.example.tinkerbell.todo.Dto.TodoDto;
+import com.example.tinkerbell.todo.Dto.TodoListResponseDto;
+import com.example.tinkerbell.todo.Dto.TodoRequestDto;
 import com.example.tinkerbell.todo.entity.Category;
 import com.example.tinkerbell.todo.entity.Todo;
 import com.example.tinkerbell.todo.repository.CategoryRepository;
@@ -30,7 +31,7 @@ public class TodoService {
 	private final TodoCategoryRepository todoCategoryRepository;
 
 	@Transactional(readOnly = true)
-	public TodoDto.ListResponse getTodoList(User user, TodoDto.Query todoQuery) {
+	public TodoListResponseDto getTodoList(User user, TodoRequestDto.Query todoQuery) {
 		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
 		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.of(23, 59, 59));
 
@@ -42,23 +43,23 @@ public class TodoService {
 
 		System.out.println(incompletedTodoList);
 
-		TodoDto.ListResponse listResponse = new TodoDto.ListResponse();
+		TodoRequestDto.ListResponse listResponse = new TodoRequestDto.ListResponse();
 		listResponse.setCompletedTodoList(
-			completedTodoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList());
+			completedTodoList.stream().map(todo -> modelMapper.map(todo, TodoRequestDto.Response.class)).toList());
 		listResponse.setIncompletedTodoList(
-			incompletedTodoList.stream().map(todo -> modelMapper.map(todo, TodoDto.Response.class)).toList());
+			incompletedTodoList.stream().map(todo -> modelMapper.map(todo, TodoRequestDto.Response.class)).toList());
 		return listResponse;
 	}
 
 	@Transactional(readOnly = true)
-	public TodoDto.Response getTodo(int id, User user) {
+	public TodoRequestDto.Response getTodo(int id, User user) {
 		Todo todo = todoRepository.findByIdAndUserId(id, user.getId())
 			.orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
-		return modelMapper.map(todo, TodoDto.Response.class);
+		return modelMapper.map(todo, TodoRequestDto.Response.class);
 	}
 
 	@Transactional
-	public TodoDto.Response saveTodo(TodoDto.Request todoDto, User user) {
+	public TodoRequestDto.Response saveTodo(TodoRequestDto.Request todoDto, User user) {
 		Todo todo = new Todo();
 		todo.setTitle(todoDto.getTitle());
 		todo.setDate(todoDto.getDate());
@@ -88,11 +89,11 @@ public class TodoService {
 			todo.setOrder(maxOrderTodo.get().getOrder() + 1);
 		}
 
-		return modelMapper.map(todoRepository.save(todo), TodoDto.Response.class);
+		return modelMapper.map(todoRepository.save(todo), TodoRequestDto.Response.class);
 	}
 
 	@Transactional
-	public void changeTodo(int id, TodoDto.Request todoDto, User user) {
+	public void changeTodo(int id, TodoRequestDto.Request todoDto, User user) {
 		Todo todo = todoRepository.findById(id).orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
 
 		if (!isTodoOwner(todo, user)) {
@@ -141,7 +142,7 @@ public class TodoService {
 	}
 
 	@Transactional
-	public void changeTodoIsCompleted(int id, TodoDto.IsCompletedRequest todoIsCompletedDto, User user) {
+	public void changeTodoIsCompleted(int id, TodoRequestDto.IsCompletedRequest todoIsCompletedDto, User user) {
 		Todo todo = todoRepository.findById(id).orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
 
 		if (!isTodoOwner(todo, user)) {
@@ -153,7 +154,7 @@ public class TodoService {
 	}
 
 	@Transactional
-	public void changeTodoOrder(TodoDto.OrderRequest orderRequest, User user) {
+	public void changeTodoOrder(TodoRequestDto.OrderRequest orderRequest, User user) {
 		orderRequest.getOrderList().stream().forEach(order -> {
 			Todo todo = todoRepository.findById(order.getId())
 				.orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
