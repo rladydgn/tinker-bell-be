@@ -84,10 +84,8 @@ public class TodoService {
 			user.getId(), false, from, to);
 
 		if (maxOrderTodo.isEmpty()) {
-			System.out.println("empty");
 			todo.setOrder(0);
 		} else {
-			System.out.println(maxOrderTodo.get());
 			todo.setOrder(maxOrderTodo.get().getOrder() + 1);
 		}
 
