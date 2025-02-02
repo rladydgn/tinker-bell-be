@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.tinkerbell.oAuth.entity.User;
+import com.example.tinkerbell.todo.Dto.TodoIsCompletedRequestDto;
 import com.example.tinkerbell.todo.Dto.TodoListResponseDto;
+import com.example.tinkerbell.todo.Dto.TodoOrderListRequestDto;
+import com.example.tinkerbell.todo.Dto.TodoQuery;
 import com.example.tinkerbell.todo.Dto.TodoRequestDto;
+import com.example.tinkerbell.todo.Dto.TodoResponseDto;
 import com.example.tinkerbell.todo.entity.Category;
 import com.example.tinkerbell.todo.entity.Todo;
 import com.example.tinkerbell.todo.repository.CategoryRepository;
@@ -31,7 +35,7 @@ public class TodoService {
 	private final TodoCategoryRepository todoCategoryRepository;
 
 	@Transactional(readOnly = true)
-	public TodoListResponseDto getTodoList(User user, TodoRequestDto.Query todoQuery) {
+	public TodoListResponseDto getTodoList(User user, TodoQuery todoQuery) {
 		LocalDateTime from = todoQuery.getFrom().atStartOfDay();
 		LocalDateTime to = todoQuery.getTo().atTime(LocalTime.of(23, 59, 59));
 
@@ -43,23 +47,21 @@ public class TodoService {
 
 		System.out.println(incompletedTodoList);
 
-		TodoRequestDto.ListResponse listResponse = new TodoRequestDto.ListResponse();
-		listResponse.setCompletedTodoList(
-			completedTodoList.stream().map(todo -> modelMapper.map(todo, TodoRequestDto.Response.class)).toList());
-		listResponse.setIncompletedTodoList(
-			incompletedTodoList.stream().map(todo -> modelMapper.map(todo, TodoRequestDto.Response.class)).toList());
+		TodoListResponseDto listResponse = new TodoListResponseDto();
+		listResponse.setCompletedTodoList(completedTodoList.stream().map(TodoResponseDto::toDto).toList());
+		listResponse.setIncompletedTodoList(incompletedTodoList.stream().map(TodoResponseDto::toDto).toList());
 		return listResponse;
 	}
 
 	@Transactional(readOnly = true)
-	public TodoRequestDto.Response getTodo(int id, User user) {
+	public TodoResponseDto getTodo(int id, User user) {
 		Todo todo = todoRepository.findByIdAndUserId(id, user.getId())
 			.orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
-		return modelMapper.map(todo, TodoRequestDto.Response.class);
+		return TodoResponseDto.toDto(todo);
 	}
 
 	@Transactional
-	public TodoRequestDto.Response saveTodo(TodoRequestDto.Request todoDto, User user) {
+	public TodoResponseDto saveTodo(TodoRequestDto todoDto, User user) {
 		Todo todo = new Todo();
 		todo.setTitle(todoDto.getTitle());
 		todo.setDate(todoDto.getDate());
@@ -89,11 +91,11 @@ public class TodoService {
 			todo.setOrder(maxOrderTodo.get().getOrder() + 1);
 		}
 
-		return modelMapper.map(todoRepository.save(todo), TodoRequestDto.Response.class);
+		return TodoResponseDto.toDto(todoRepository.save(todo));
 	}
 
 	@Transactional
-	public void changeTodo(int id, TodoRequestDto.Request todoDto, User user) {
+	public void changeTodo(int id, TodoRequestDto todoDto, User user) {
 		Todo todo = todoRepository.findById(id).orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
 
 		if (!isTodoOwner(todo, user)) {
@@ -142,7 +144,7 @@ public class TodoService {
 	}
 
 	@Transactional
-	public void changeTodoIsCompleted(int id, TodoRequestDto.IsCompletedRequest todoIsCompletedDto, User user) {
+	public void changeTodoIsCompleted(int id, TodoIsCompletedRequestDto todoIsCompletedDto, User user) {
 		Todo todo = todoRepository.findById(id).orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
 
 		if (!isTodoOwner(todo, user)) {
@@ -154,8 +156,8 @@ public class TodoService {
 	}
 
 	@Transactional
-	public void changeTodoOrder(TodoRequestDto.OrderRequest orderRequest, User user) {
-		orderRequest.getOrderList().stream().forEach(order -> {
+	public void changeTodoOrder(TodoOrderListRequestDto orderListRequestDto, User user) {
+		orderListRequestDto.getOrderList().stream().forEach(order -> {
 			Todo todo = todoRepository.findById(order.getId())
 				.orElseThrow(() -> new ValidationException("찾을 수 없는 todo 입니다."));
 
@@ -169,6 +171,6 @@ public class TodoService {
 	}
 
 	private boolean isTodoOwner(Todo todo, User user) {
-		return todo.getUser().getId() == user.getId() ? true : false;
+		return todo.getUser().getId() == user.getId();
 	}
 }

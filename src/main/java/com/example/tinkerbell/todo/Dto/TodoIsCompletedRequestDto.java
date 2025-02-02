@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class TodoIsCompletedResponseDto {
+public class TodoIsCompletedRequestDto {
 	@JsonProperty("isCompleted")
 	private boolean isCompleted;
 }

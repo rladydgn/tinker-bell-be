@@ -16,7 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.tinkerbell.oAuth.annotation.Login;
 import com.example.tinkerbell.oAuth.entity.User;
+import com.example.tinkerbell.todo.Dto.TodoIsCompletedRequestDto;
+import com.example.tinkerbell.todo.Dto.TodoListResponseDto;
+import com.example.tinkerbell.todo.Dto.TodoOrderListRequestDto;
+import com.example.tinkerbell.todo.Dto.TodoQuery;
 import com.example.tinkerbell.todo.Dto.TodoRequestDto;
+import com.example.tinkerbell.todo.Dto.TodoResponseDto;
 import com.example.tinkerbell.todo.service.TodoService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +36,7 @@ public class TodoController {
 
 	@Operation(summary = "유저의 todo 단건 조회")
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<TodoRequestDto.Response> getTodo(@PathVariable int id,
+	public ResponseEntity<TodoResponseDto> getTodo(@PathVariable int id,
 		@Parameter(hidden = true) @Login User user) {
 		return ResponseEntity.ok(todoService.getTodo(id, user));
 	}
@@ -39,8 +44,8 @@ public class TodoController {
 	@Operation(summary = "유저의 todo 목록 조회", description = "from 보다 크거나 작고, to 보다 작거나 같은 날짜의 todo 를 구한다. "
 		+ "from, to 를 입력하지 않을 경우 자동으로 각각 서버기준 오늘 날짜가 들어간다. order 기준 오름차순으로 정렬된다.")
 	@GetMapping
-	public ResponseEntity<TodoRequestDto.ListResponse> getTodoList(@Parameter(hidden = true) @Login User user,
-		TodoRequestDto.Query todoQuery) {
+	public ResponseEntity<TodoListResponseDto> getTodoList(@Parameter(hidden = true) @Login User user,
+		TodoQuery todoQuery) {
 		if (todoQuery.getFrom() == null) {
 			todoQuery.setFrom(LocalDate.now());
 		}
@@ -52,16 +57,16 @@ public class TodoController {
 
 	@Operation(summary = "todo 생성")
 	@PostMapping
-	public ResponseEntity<TodoRequestDto.Response> saveTodo(@RequestBody TodoRequestDto.Request todoDto,
+	public ResponseEntity<TodoResponseDto> saveTodo(@RequestBody TodoRequestDto todoDto,
 		@Parameter(hidden = true) @Login User user) {
-		TodoRequestDto.Response response = todoService.saveTodo(todoDto, user);
+		TodoResponseDto response = todoService.saveTodo(todoDto, user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@Operation(summary = "todo 수정", description = "유저 본인이 생성한 todo 만 수정 가능")
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<Void> changeTodo(@PathVariable int id,
-		@RequestBody TodoRequestDto.Request todoDto,
+		@RequestBody TodoRequestDto todoDto,
 		@Parameter(hidden = true) @Login User user) {
 		todoService.changeTodo(id, todoDto, user);
 		return ResponseEntity.ok().build();
@@ -77,16 +82,16 @@ public class TodoController {
 	@Operation(summary = "todo 완료 상태 변경")
 	@PatchMapping(value = "/completion/{id}")
 	public ResponseEntity<Void> changeTodoIsCompleted(@PathVariable int id,
-		@RequestBody TodoRequestDto.IsCompletedRequest todoIsCompletedDto, @Parameter(hidden = true) @Login User user) {
+		@RequestBody TodoIsCompletedRequestDto todoIsCompletedDto, @Parameter(hidden = true) @Login User user) {
 		todoService.changeTodoIsCompleted(id, todoIsCompletedDto, user);
 		return ResponseEntity.ok().build();
 	}
 
 	@Operation(summary = "todo 순서 저장", description = "목록의 순서를 정렬한다. 데이터는 order 오름차순으로 정렬된다.")
 	@PutMapping(value = "/orders")
-	public ResponseEntity<Void> changeTodoOrder(@RequestBody TodoRequestDto.OrderRequest orderRequest,
+	public ResponseEntity<Void> changeTodoOrder(@RequestBody TodoOrderListRequestDto orderListRequestDto,
 		@Parameter(hidden = true) @Login User user) {
-		todoService.changeTodoOrder(orderRequest, user);
+		todoService.changeTodoOrder(orderListRequestDto, user);
 		return ResponseEntity.ok().build();
 	}
 }
