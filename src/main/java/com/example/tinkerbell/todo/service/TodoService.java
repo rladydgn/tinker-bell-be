@@ -103,7 +103,7 @@ public class TodoService {
 		todo.setTitle(todoDto.getTitle());
 		todo.setDescription(todoDto.getDescription());
 		// 날짜 변경시 할일의 순서를 해당 날짜의 제일 마지막으로 수정
-		if (todo.getDate() != todoDto.getDate()) {
+		if (!todo.getDate().isEqual(todoDto.getDate())) {
 			LocalDateTime from = todoDto.getDate().toLocalDate().atStartOfDay();
 			LocalDateTime to = todoDto.getDate().toLocalDate().atTime(LocalTime.of(23, 59, 59));
 			Optional<Todo> maxOrderTodo = todoRepository.findFirstByUserIdAndIsCompletedAndDateBetweenOrderByOrderDesc(
