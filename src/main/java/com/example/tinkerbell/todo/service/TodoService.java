@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,6 @@ import com.example.tinkerbell.todo.Dto.TodoResponseDto;
 import com.example.tinkerbell.todo.entity.Category;
 import com.example.tinkerbell.todo.entity.Todo;
 import com.example.tinkerbell.todo.repository.CategoryRepository;
-import com.example.tinkerbell.todo.repository.TodoCategoryRepository;
 import com.example.tinkerbell.todo.repository.TodoRepository;
 
 import jakarta.validation.ValidationException;
@@ -30,9 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class TodoService {
 	private final TodoRepository todoRepository;
-	private final ModelMapper modelMapper;
 	private final CategoryRepository categoryRepository;
-	private final TodoCategoryRepository todoCategoryRepository;
 
 	@Transactional(readOnly = true)
 	public TodoListResponseDto getTodoList(User user, TodoQuery todoQuery) {
