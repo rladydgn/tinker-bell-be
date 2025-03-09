@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,13 +30,29 @@ public class CommonService {
 
 		try {
 			JsonNode root = objectMapper.readTree(result);
-			ArrayNode holidayInfo = (ArrayNode)root.get("response").get("body").get("items").get("item");
+			JsonNode holidayInfo = root.get("response").get("body").get("items").get("item");
 			List<OpenApiHolidayResponse> holidayList = new ArrayList<>();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-			holidayInfo.forEach(jsonNode -> {
+			// 공휴일이 없을 경우
+			if (Objects.isNull(holidayInfo)) {
+				return holidayList;
+			}
+
+			// 공휴일이 하루일 경우
+			if (!holidayInfo.isArray()) {
+				OpenApiHolidayResponse holiday = new OpenApiHolidayResponse();
+				holiday.setDateName(holidayInfo.get("dateName").asText());
+				holiday.setDate(LocalDate.parse(holidayInfo.get("locdate").asText(), formatter));
+				holidayList.add(holiday);
+				return holidayList;
+			}
+
+			// 공후일이 여러날이라 array 인 경우
+			ArrayNode holidayInfoArray = (ArrayNode)holidayInfo;
+			holidayInfoArray.forEach(jsonNode -> {
 				OpenApiHolidayResponse holiday = new OpenApiHolidayResponse();
 				holiday.setDateName(jsonNode.get("dateName").asText());
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 				holiday.setDate(LocalDate.parse(jsonNode.get("locdate").asText(), formatter));
 				holidayList.add(holiday);
 			});
